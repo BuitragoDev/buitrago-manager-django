@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aviso Legal — Buitrago Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:  #080c12;
+    --bg-card:  #111c2d;
+    --border:   #1e304a;
+    --accent:   #00d4ff;
+    --text-pri: #eaf2fb;
+    --text-sec: #8ab0cc;
+    --text-dim: #3d5a75;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-pri);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% 0%, rgba(0,80,160,.15) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,74,.10) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,74,.06) 40px);
+  }
+  .card {
+    width: 100%;
+    max-width: 680px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 28px 36px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-header h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .card-header p {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: .5px;
+    margin-top: 6px;
+  }
+  .card-body {
+    padding: 28px 36px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .section h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .section p {
+    font-size: 14px;
+    color: var(--text-sec);
+    line-height: 1.7;
+  }
+  .back-link {
+    margin-top: 28px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 8px 20px;
+    border-radius: 4px;
+    transition: all .2s;
+    display: inline-block;
+  }
+  .back-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(0,212,255,.06);
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-header">
+    <h1>Aviso Legal</h1>
+    <p>Buitrago Manager &mdash; Proyecto personal</p>
+  </div>
+  <div class="card-body">
+
+    <div class="section">
+      <h2>Naturaleza del proyecto</h2>
+      <p>
+        Buitrago Manager es un videojuego de gestión deportiva desarrollado exclusivamente
+        como proyecto personal con fines de aprendizaje y demostración de habilidades
+        técnicas en el ámbito del desarrollo web. No tiene ningún fin comercial,
+        publicitario ni lucrativo de ningún tipo.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Uso de nombres, escudos y marcas</h2>
+      <p>
+        Los nombres de equipos, escudos, estadios y demás referencias a clubes de fútbol
+        utilizados en esta aplicación son propiedad de sus respectivos titulares.
+        Su uso en este proyecto es meramente ilustrativo y educativo, sin ningún ánimo
+        de lucro ni intención de apropiación de dichas marcas registradas.
+        Este sitio no está afiliado, patrocinado ni respaldado por ninguna liga,
+        club ni organización deportiva.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Datos y privacidad</h2>
+      <p>
+        La aplicación no recopila, almacena ni comparte datos personales de los usuarios
+        más allá del nombre de mánager introducido voluntariamente para el juego,
+        el cual se guarda únicamente en la sesión activa y no se transfiere a terceros.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Contacto</h2>
+      <p>
+        Este proyecto forma parte del portfolio personal de su autor.
+        Para cualquier consulta relacionada con el uso de contenidos,
+        puede ponerse en contacto a través de <a href="https://github.com/BuitragoDev" target="_blank">GitHub</a>.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<a href="/" class="back-link">&#8592; Volver al juego</a>
+
+</body>
+</html>

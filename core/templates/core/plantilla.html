@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buitrago Manager &mdash; Plantilla</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:   #080c12;
+    --bg-panel:  #0d1520;
+    --bg-card:   #111c2d;
+    --bg-hover:  #162234;
+    --border:    #1e304a;
+    --border-lit:#2a4668;
+    --accent:    #00d4ff;
+    --text-pri:  #eaf2fb;
+    --text-sec:  #8ab0cc;
+    --text-dim:  #3d5a75;
+    --green:     #00c875;
+    --red:       #ff3d5a;
+    --yellow:    #ffc337;
+    --por-color: #f59e0b;
+    --def-color: #3b82f6;
+    --med-color: #10b981;
+    --del-color: #ef4444;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg-deep); color: var(--text-pri);
+    display: flex; flex-direction: column;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0,80,160,.18) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,74,.15) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,74,.08) 40px);
+  }
+
+  /* ══ TOPBAR ══ */
+  .topbar {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #090f1a 0%, #0e1b2a 100%);
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center;
+    height: 64px; padding: 0 24px;
+    box-shadow: 0 2px 24px rgba(0,0,0,.8); z-index: 100;
+  }
+  .topbar-logo {
+    font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    padding-right: 28px; border-right: 1px solid var(--border);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .topbar-team {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 28px; border-right: 1px solid var(--border); flex-shrink: 0;
+  }
+  .escudo-top { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+  .team-name   { font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 600; letter-spacing: 1px; color: var(--text-pri); line-height: 1.1; }
+  .team-league { font-size: 12px; color: var(--text-sec); text-transform: uppercase; letter-spacing: .8px; }
+  .topbar-stat { display: flex; flex-direction: column; padding: 0 28px; border-right: 1px solid var(--border); gap: 1px; flex-shrink: 0; }
+  .topbar-stat .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); }
+  .topbar-stat .val { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 500; color: var(--text-pri); letter-spacing: .5px; line-height: 1.1; }
+  .val-accent { color: var(--accent) !important; }
+  .topbar-spacer { flex: 1; }
+  .topbar-nav { display: flex; gap: 5px; flex-shrink: 0; }
+  .nav-btn {
+    padding: 7px 13px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-sec);
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 500;
+    letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; border-radius: 3px; transition: all .18s;
+    text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap;
+  }
+  .nav-btn:hover  { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.06); }
+  .nav-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.12); }
+
+  /* ══ MAIN ══ */
+  .main {
+    flex: 1; min-height: 0; overflow: hidden;
+    padding: 16px 28px 14px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .page-title { display: flex; align-items: baseline; gap: 14px; flex-shrink: 0; }
+  .page-title h1 {
+    font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--text-pri);
+  }
+  .page-title .sub { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; }
+  .title-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-lit), transparent); margin-bottom: 3px; }
+
+  /* ══ TABLA ══ */
+  .tabla-wrap {
+    flex: 1; min-height: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /*
+    Columnas (de izquierda a derecha):
+    # | Nombre | DEM | ESTADO | VEL | REG | PAS | DIS | DEF | FIS | POR |  GOL | ASI | VAL | AMA | ROJ | CONT | ACCION
+   38 | 360    | 58  |  90    | 52  | 52  | 52  | 52  | 52  | 52  | 52  |  52  | 52  | 58  | 52  | 52  | 80  | 100
+  */
+  .t-grid {
+    display: grid;
+    grid-template-columns: 38px 360px 58px 90px 52px 52px 52px 52px 52px 52px 52px 52px 52px 64px 58px 52px 52px 80px 200px;
+    align-items: center;
+    padding: 0 12px;
+  }
+
+  .t-head {
+    flex-shrink: 0;
+    height: 30px;
+    background: rgba(255,255,255,.022);
+    border-bottom: 2px solid var(--border);
+  }
+  .th {
+    font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 600;
+    letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-dim);
+    text-align: center; white-space: nowrap;
+  }
+  .th.left { text-align: left; }
+  /* Separadores visuales entre grupos de columnas */
+  .th.sep, .td.sep { border-left: 1px solid var(--border); }
+
+  .t-body { flex: 1; min-height: 0; overflow-y: auto; }
+  .t-body::-webkit-scrollbar { width: 5px; }
+  .t-body::-webkit-scrollbar-track { background: var(--bg-card); }
+  .t-body::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 3px; }
+
+  /* ══ FILAS ══ */
+  .t-row {
+    height: 40px;
+    border-bottom: 1px solid rgba(30,48,74,.3);
+    transition: background .1s;
+  }
+  .t-row:last-child { border-bottom: none; }
+  .t-row:hover { background: var(--bg-hover); }
+
+  /* Dorsal */
+  .dorsal {
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700;
+    color: var(--text-dim); text-align: center;
+  }
+
+  /* Nombre */
+  .jugador-info { display: flex; align-items: baseline; gap: 5px; min-width: 0; overflow: hidden; }
+  .jugador-nombre {
+    font-family: 'Exo 2', sans-serif; font-size: 13px; font-weight: 600;
+    color: var(--text-pri); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .jugador-edad { font-size: 10px; color: var(--text-dim); flex-shrink: 0; }
+
+  /* Badge de demarcación */
+  .dem-badge {
+    font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
+    letter-spacing: 1.5px; padding: 2px 6px; border-radius: 3px; color: #fff;
+    display: inline-block;
+  }
+  .badge-por { background: var(--por-color); }
+  .badge-def { background: var(--def-color); }
+  .badge-med { background: var(--med-color); }
+  .badge-del { background: var(--del-color); }
+
+  /* Badge de lesión */
+  .lesion-badge {
+    font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
+    letter-spacing: 1px; padding: 2px 6px; border-radius: 3px;
+    color: var(--red); border: 1px solid var(--red);
+    background: rgba(255,61,90,.1); display: inline-block;
+  }
+
+  /* Atributos */
+  .attr { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; text-align: center; color: var(--text-sec); }
+  .media-col { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; color: var(--accent); text-align: center; }
+
+  /* Stats */
+  .s-gol { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-align: center; color: var(--yellow); }
+  .s-ast { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-align: center; color: var(--green); }
+  .s-val { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-align: center; color: var(--accent); }
+  .s-ama { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-align: center; color: var(--yellow); }
+  .s-roj { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-align: center; color: var(--red); }
+  .s-cero { color: var(--text-dim) !important; font-weight: 400 !important; }
+
+  /* Contrato */
+  .contrato { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-align: center; }
+  .cont-ok     { color: var(--green); }
+  .cont-warn   { color: var(--yellow); }
+  .cont-danger { color: var(--red); }
+
+  /* Acción */
+  .accion-col { display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn-renovar {
+    font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    background: linear-gradient(135deg, #1a5a2e, #0d3a1e);
+    color: var(--green); border: 1px solid var(--green);
+    padding: 4px 10px; border-radius: 3px; cursor: pointer;
+    transition: all .18s; box-shadow: 0 0 8px rgba(0,200,117,.15);
+  }
+  .btn-renovar:hover { background: linear-gradient(135deg, #1e6e37, #115228); box-shadow: 0 0 14px rgba(0,200,117,.35); transform: translateY(-1px); }
+  .btn-renovar:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  .btn-despedir {
+    font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    background: linear-gradient(135deg, #3a0d0d, #1e0808);
+    color: var(--red); border: 1px solid var(--red);
+    padding: 4px 10px; border-radius: 3px; cursor: pointer;
+    transition: all .18s; box-shadow: 0 0 8px rgba(255,61,90,.1);
+  }
+  .btn-despedir:hover { background: linear-gradient(135deg, #5a1515, #3a0d0d); box-shadow: 0 0 14px rgba(255,61,90,.3); transform: translateY(-1px); }
+  .btn-despedir:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  /* Footer */
+  footer {
+    flex-shrink: 0; background: var(--bg-panel); border-top: 1px solid var(--border);
+    padding: 7px 24px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-name {
+    font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .footer-ver { font-size: 12px; color: var(--text-dim); }
+  .btn-reset {
+    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-dim); text-decoration: none;
+    border: 1px solid var(--border); padding: 4px 10px; border-radius: 3px; transition: all .18s;
+  }
+  .btn-reset:hover { color: var(--red); border-color: var(--red); background: rgba(255,61,90,.08); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-logo">Buitrago Manager</div>
+  <div class="topbar-team">
+    <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
+    <div>
+      <div class="team-name">{{ equipo.nombre }}</div>
+      <div class="team-league">{{ liga.nombre }}</div>
+    </div>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">M&aacute;nager</span>
+    <span class="val">{{ manager.nombre }}</span>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">Jornada</span>
+    <span class="val">{{ liga.jornada_actual }} / {{ liga.jornadas_totales }}</span>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">Fecha</span>
+    <span class="val val-accent">{{ fecha_juego|date:"D d M Y" }}</span>
+  </div>
+  <div class="topbar-spacer"></div>
+  <nav class="topbar-nav">
+    <a href="{% url 'dashboard' %}"        class="nav-btn">Inicio</a>
+    <a href="{% url 'plantilla' %}"        class="nav-btn active">Plantilla</a>
+    <a href="{% url 'mercado_fichajes' %}" class="nav-btn">Fichajes</a>
+    <a href="{% url 'clasificacion' %}"    class="nav-btn">Clasificaci&oacute;n</a>
+    <a href="{% url 'resultados' %}"       class="nav-btn">Resultados</a>
+    <a href="{% url 'estadisticas' %}"     class="nav-btn">Estad&iacute;sticas</a>
+    <a href="{% url 'historico' %}"        class="nav-btn">Hist&oacute;rico</a>
+  </nav>
+</header>
+
+<main class="main">
+  <div class="page-title">
+    <h1>Plantilla</h1>
+    <span class="sub">{{ equipo.nombre }} &middot; {{ liga.temporada }} &middot; {{ jugadores|length }} jugadores</span>
+    <div class="title-line"></div>
+  </div>
+
+  <div class="tabla-wrap">
+
+    <!-- CABECERA -->
+    <div class="t-grid t-head">
+      <div class="th">#</div>
+      <div class="th left">Nombre</div>
+      <div class="th">Dem.</div>
+      <div class="th">Estado</div>
+      <!-- Atributos -->
+      <div class="th sep">Vel.</div>
+      <div class="th">Reg.</div>
+      <div class="th">Pase</div>
+      <div class="th">Dis.</div>
+      <div class="th">Def.</div>
+      <div class="th">F&iacute;s.</div>
+      <div class="th">Port.</div><div class="th">Media</div>
+      <!-- Estadísticas temporada -->
+      <div class="th sep">Goles</div>
+      <div class="th">Asist.</div>
+      <div class="th">Val.</div>
+      <div class="th">Ama.</div>
+      <div class="th">Roj.</div>
+      <!-- Contrato y acción -->
+      <div class="th sep">Contrato</div>
+      <div class="th"></div>
+    </div>
+
+    <!-- CUERPO -->
+    <div class="t-body">{% for j in plantilla_dict.POR %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-por">POR</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}{% for j in plantilla_dict.DEF %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-def">DEF</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}{% for j in plantilla_dict.MED %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-med">MED</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}{% for j in plantilla_dict.DEL %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-del">DEL</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}</div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="footer-name">Buitrago Manager</div>
+  <div class="footer-ver">{{ liga.nombre }} {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual }}</div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <div class="footer-ver">Versi&oacute;n 0.1.0 Alpha</div>
+    <a href="{% url 'reset_juego' %}" class="btn-reset"
+       onclick="return confirm('Seguro? Se borraran todos los datos y empezaras desde cero.')">
+      &#8635; Nueva Partida
+    </a>
+  </div>
+</footer>
+
+<script>
+  const CSRF = (document.cookie.split(';').find(c => c.trim().startsWith('csrftoken=')) || '').split('=')[1] || '';
+
+  // Escudo topbar
+
+
+  document.querySelectorAll('.t-row').forEach(row => {
+    const contrato    = parseInt(row.getAttribute('data-contrato'));
+    const edad        = parseInt(row.getAttribute('data-edad'));
+    const lesionado   = row.getAttribute('data-lesionado') === 'True';
+    const urlRenovar  = row.getAttribute('data-renovar-url');
+    const urlDespedir = row.getAttribute('data-despedir-url');
+    const nombre      = row.getAttribute('data-nombre');
+
+    // Badge LESIONADO
+    const estadoCol = row.querySelector('.estado-col');
+    if (lesionado) {
+      const badge = document.createElement('span');
+      badge.className = 'lesion-badge';
+      badge.textContent = 'LESIONADO';
+      estadoCol.style.textAlign = 'center';
+      estadoCol.appendChild(badge);
+    }
+
+    // Color contrato
+    const contEl = row.querySelector('.contrato');
+    if (contrato <= 1)      contEl.classList.add('cont-danger');
+    else if (contrato <= 2) contEl.classList.add('cont-warn');
+    else                    contEl.classList.add('cont-ok');
+
+    // Ceros apagados
+    row.querySelectorAll('.s-gol, .s-ast, .s-ama, .s-roj').forEach(el => {
+      if (el.textContent.trim() === '0') el.classList.add('s-cero');
+    });
+
+    const accion = row.querySelector('.accion-col');
+
+    // Botón RENOVAR solo si queda 1 temporada de contrato
+    if (contrato <= 1) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-renovar';
+      btn.textContent = 'RENOVAR';
+      btn.title = edad < 30 ? '< 30 años → 4 temporadas' : '≥ 30 años → 2 temporadas';
+      btn.addEventListener('click', () => {
+        btn.disabled = true; btn.textContent = '...';
+        fetch(urlRenovar, { method: 'POST', headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' } })
+          .then(r => r.json())
+          .then(d => { if (d.ok) window.location.reload(); else { btn.disabled = false; btn.textContent = 'RENOVAR'; } })
+          .catch(() => { btn.disabled = false; btn.textContent = 'RENOVAR'; });
+      });
+      accion.appendChild(btn);
+    }
+
+    // Botón DESPEDIR siempre visible
+    const btnD = document.createElement('button');
+    btnD.className = 'btn-despedir';
+    btnD.textContent = 'DESPEDIR';
+    btnD.title = `Despedir a ${nombre} y mandarlo al mercado`;
+    btnD.addEventListener('click', () => {
+      if (!confirm(`¿Seguro que quieres despedir a ${nombre}? Pasará al mercado de fichajes.`)) return;
+      btnD.disabled = true; btnD.textContent = '...';
+      fetch(urlDespedir, { method: 'POST', headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' } })
+        .then(r => r.json())
+        .then(d => {
+          if (d.ok) {
+            row.style.transition = 'opacity .4s';
+            row.style.opacity = '0';
+            setTimeout(() => row.remove(), 400);
+          } else {
+            btnD.disabled = false; btnD.textContent = 'DESPEDIR';
+            alert(d.mensaje);
+          }
+        })
+        .catch(() => { btnD.disabled = false; btnD.textContent = 'DESPEDIR'; });
+    });
+    accion.appendChild(btnD);
+  });
+</script>
+</body>
+</html>

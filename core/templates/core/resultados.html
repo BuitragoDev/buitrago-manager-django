@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutMaster &mdash; Resultados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:   #080c12;
+    --bg-panel:  #0d1520;
+    --bg-card:   #111c2d;
+    --bg-hover:  #162234;
+    --border:    #1e304a;
+    --border-lit:#2a4668;
+    --accent:    #00d4ff;
+    --text-pri:  #eaf2fb;
+    --text-sec:  #8ab0cc;
+    --text-dim:  #3d5a75;
+    --green:     #00c875;
+    --red:       #ff3d5a;
+    --yellow:    #ffc337;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg-deep); color: var(--text-pri);
+    display: flex; flex-direction: column;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0,80,160,.18) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,74,.15) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,74,.08) 40px);
+  }
+
+  /* ══ TOPBAR ══ */
+  .topbar {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #090f1a 0%, #0e1b2a 100%);
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center;
+    height: 64px; padding: 0 24px;
+    box-shadow: 0 2px 24px rgba(0,0,0,.8); z-index: 100;
+  }
+  .topbar-logo {
+    font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    padding-right: 28px; border-right: 1px solid var(--border);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .topbar-team {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 28px; border-right: 1px solid var(--border); flex-shrink: 0;
+  }
+  .escudo-top { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+  .team-name   { font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 600; letter-spacing: 1px; color: var(--text-pri); line-height: 1.1; }
+  .team-league { font-size: 12px; color: var(--text-sec); text-transform: uppercase; letter-spacing: .8px; }
+  .topbar-stat { display: flex; flex-direction: column; padding: 0 28px; border-right: 1px solid var(--border); gap: 1px; flex-shrink: 0; }
+  .topbar-stat .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); }
+  .topbar-stat .val { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 500; color: var(--text-pri); letter-spacing: .5px; line-height: 1.1; }
+  .val-accent { color: var(--accent) !important; }
+  .topbar-spacer { flex: 1; }
+  .topbar-nav { display: flex; gap: 5px; flex-shrink: 0; }
+  .nav-btn {
+    padding: 7px 13px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-sec);
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 500;
+    letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; border-radius: 3px; transition: all .18s;
+    text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap;
+  }
+  .nav-btn:hover  { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.06); }
+  .nav-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.12); }
+
+  /* ══ MAIN ══ */
+  .main {
+    flex: 1; min-height: 0; overflow: hidden;
+    padding: 16px 28px 14px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .page-title { display: flex; align-items: baseline; gap: 14px; flex-shrink: 0; }
+  .page-title h1 {
+    font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--text-pri);
+  }
+  .page-title .sub { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; }
+  .title-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-lit), transparent); margin-bottom: 3px; }
+
+  /* ══ PAGINADOR DE JORNADAS ══ */
+  .paginador {
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; gap: 24px;
+  }
+  .btn-nav {
+    width: 44px; height: 44px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 6px; cursor: pointer; color: var(--text-sec);
+    font-size: 20px; display: flex; align-items: center; justify-content: center;
+    transition: all .18s; flex-shrink: 0; user-select: none;
+  }
+  .btn-nav:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.08); }
+  .btn-nav:disabled { opacity: .25; cursor: not-allowed; }
+
+  .jornada-info {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    min-width: 240px;
+  }
+  .jornada-num {
+    font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--text-pri);
+  }
+  .jornada-fecha { font-size: 15px; color: var(--text-sec); letter-spacing: 1px; }
+  .jornada-badge {
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; padding: 4px 14px; border-radius: 3px;
+  }
+  .jornada-badge-wrap {
+    margin-top: 15px;
+  }
+  .badge-disputada  { color: var(--green);  border: 1px solid var(--green);  background: rgba(0,200,117,.08); }
+  .badge-pendiente  { color: var(--text-sec); border: 1px solid var(--border-lit); background: transparent; }
+  .badge-actual     { color: var(--yellow); border: 1px solid var(--yellow); background: rgba(255,195,55,.08); }
+
+  /* Indicadores de jornada — una sola fila, sin wrap */
+  .jornada-dots {
+    display: flex; gap: 5px; align-items: center;
+    flex-wrap: nowrap; overflow: hidden;
+    max-width: 700px;
+  }
+  .dot {
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--border); cursor: pointer;
+    transition: all .15s; flex-shrink: 0;
+  }
+  .dot.disputada  { background: var(--green); opacity: .6; }
+  .dot.actual     { background: var(--yellow); transform: scale(1.4); opacity: 1; }
+  .dot.pendiente  { background: var(--border-lit); }
+  .dot:hover      { opacity: 1; transform: scale(1.4); }
+
+  /* ══ PARTIDOS ══ */
+  .partidos-wrap {
+    flex: 1; min-height: 0; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 8px;
+    padding-right: 4px;
+  }
+  .partidos-wrap::-webkit-scrollbar { width: 4px; }
+  .partidos-wrap::-webkit-scrollbar-track { background: transparent; }
+  .partidos-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Tarjeta de partido */
+  .partido-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: grid;
+    grid-template-columns: 1fr 130px 1fr;
+    align-items: center;
+    padding: 12px 20px;
+    transition: border-color .15s;
+    gap: 12px;
+  }
+  .partido-card:hover { border-color: var(--border-lit); }
+  .partido-card.mi-partido { border-left: 3px solid var(--accent); background: rgba(0,212,255,.04); }
+  .partido-card.mi-partido:hover { border-color: var(--accent); }
+
+  /* Equipo local (alineado a la derecha) */
+  .equipo-local {
+    display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0;
+  }
+  .equipo-nombre {
+    font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600;
+    letter-spacing: .5px; color: var(--text-pri);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .equipo-nombre.mi-equipo { color: var(--accent); }
+
+  .escudo-sm { width: 28px; height: 28px; object-fit: contain; flex-shrink: 0; }
+
+  /* Marcador central */
+  .marcador {
+    display: flex; align-items: center; justify-content: center; gap: 0;
+    flex-shrink: 0;
+  }
+  .gol {
+    font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700;
+    color: var(--text-pri); width: 40px; text-align: center; line-height: 1;
+  }
+  .gol-sep {
+    font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 400;
+    color: var(--text-dim); padding: 0 2px; line-height: 1;
+  }
+  .marcador-pendiente {
+    font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 400;
+    color: var(--text-dim); letter-spacing: 4px;
+  }
+
+  /* Victoria/derrota/empate coloring */
+  .gol.win  { color: var(--green); }
+  .gol.lose { color: var(--red); }
+  .gol.draw { color: var(--yellow); }
+
+  /* Equipo visitante (alineado a la izquierda) */
+  .equipo-visitante {
+    display: flex; align-items: center; justify-content: flex-start; gap: 10px; min-width: 0;
+  }
+
+  /* Footer */
+  footer {
+    flex-shrink: 0; background: var(--bg-panel); border-top: 1px solid var(--border);
+    padding: 7px 24px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-name {
+    font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .footer-ver { font-size: 12px; color: var(--text-dim); }
+  .btn-reset {
+    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-dim); text-decoration: none;
+    border: 1px solid var(--border); padding: 4px 10px; border-radius: 3px; transition: all .18s;
+  }
+  .btn-reset:hover { color: var(--red); border-color: var(--red); background: rgba(255,61,90,.08); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-logo">&#9917; FutMaster</div>
+  <div class="topbar-team">
+    <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
+    <div>
+      <div class="team-name">{{ equipo.nombre }}</div>
+      <div class="team-league">{{ liga.nombre }}</div>
+    </div>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">M&aacute;nager</span>
+    <span class="val">{{ manager.nombre }}</span>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">Jornada</span>
+    <span class="val">{{ liga.jornada_actual }} / {{ liga.jornadas_totales }}</span>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">Fecha</span>
+    <span class="val val-accent">{{ fecha_juego|date:"D d M Y" }}</span>
+  </div>
+  <div class="topbar-spacer"></div>
+  <nav class="topbar-nav">
+    <a href="{% url 'dashboard' %}"        class="nav-btn">Inicio</a>
+    <a href="{% url 'plantilla' %}"        class="nav-btn">Plantilla</a>
+    <a href="{% url 'mercado_fichajes' %}" class="nav-btn">Fichajes</a>
+    <a href="{% url 'clasificacion' %}"    class="nav-btn">Clasificaci&oacute;n</a>
+    <a href="{% url 'resultados' %}"       class="nav-btn active">Resultados</a>
+    <a href="{% url 'estadisticas' %}"     class="nav-btn">Estad&iacute;sticas</a>
+    <a href="{% url 'historico' %}"        class="nav-btn">Hist&oacute;rico</a>
+  </nav>
+</header>
+
+<main class="main">
+  <div class="page-title">
+    <h1>Resultados</h1>
+    <span class="sub">{{ liga.nombre }} &middot; {{ liga.temporada }}</span>
+    <div class="title-line"></div>
+  </div>
+
+  <!-- PAGINADOR -->
+  <div class="paginador" style="margin: 6px 0 4px;">
+    <button class="btn-nav" id="btn-prev">&#8592;</button>
+    <div>
+      <div class="jornada-info">
+        <div class="jornada-num" id="lbl-jornada">Jornada 1</div>
+        <div class="jornada-fecha" id="lbl-fecha"></div>
+        <div id="lbl-badge" class="jornada-badge-wrap"></div>
+      </div>
+    </div>
+    <button class="btn-nav" id="btn-next">&#8594;</button>
+  </div>
+
+  <!-- DOTS -->
+  <div style="display:flex; justify-content:center; margin-bottom: 8px;">
+    <div class="jornada-dots" id="dots-container"></div>
+  </div>
+
+  <!-- PARTIDOS -->
+  <div class="partidos-wrap" id="partidos-container"></div>
+</main>
+
+<footer>
+  <div class="footer-name">&#9917; FutMaster</div>
+  <div class="footer-ver">{{ liga.nombre }} {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual }}</div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <div class="footer-ver">Versi&oacute;n 0.1.0 Alpha</div>
+    <a href="{% url 'reset_juego' %}" class="btn-reset"
+       onclick="return confirm('Seguro? Se borraran todos los datos y empezaras desde cero.')">
+      &#8635; Nueva Partida
+    </a>
+  </div>
+</footer>
+
+<!-- Datos del servidor en JSON puro, sin mezclar con JS -->
+<script type="application/json" id="datos-servidor">
+{
+  "miEquipo":    "{{ equipo.nombre_corto|escapejs }}",
+  "jornadaIni":  {{ jornada_actual }},
+  "totalJorn":   {{ liga.jornadas_totales }},
+  "jornActual":  {{ liga.jornada_actual }},
+  "temporada":   "{{ liga.temporada|escapejs }}",
+  "staticBase":  "{% static 'core/img/' %}",
+  "jornadas": [{% for j in jornadas %}{"num":{{ j.numero }},"disputada":{{ j.disputada|yesno:"true,false" }},"partidos":[{% for p in j.partidos.all %}{"local":"{{ p.equipo_local.nombre_corto|escapejs }}","localColor":"{{ p.equipo_local.color_principal|escapejs }}","localAbr":"{{ p.equipo_local.abreviatura|escapejs }}","visitante":"{{ p.equipo_visitante.nombre_corto|escapejs }}","visitanteColor":"{{ p.equipo_visitante.color_principal|escapejs }}","visitanteAbr":"{{ p.equipo_visitante.abreviatura|escapejs }}","jugado":{{ p.jugado|yesno:"true,false" }},"golesLocal":{% if p.jugado %}{{ p.goles_local }}{% else %}null{% endif %},"golesVisitante":{% if p.jugado %}{{ p.goles_visitante }}{% else %}null{% endif %}}{% if not forloop.last %},{% endif %}{% endfor %}]}{% if not forloop.last %},{% endif %}{% endfor %}]
+}
+</script>
+
+<script>
+  // ── Leer datos del servidor ───────────────────────────────────
+  const DATA        = JSON.parse(document.getElementById('datos-servidor').textContent);
+  const MI_EQUIPO   = DATA.miEquipo;
+  const JORNADA_INI = DATA.jornadaIni;
+  const TOTAL_JORN  = DATA.totalJorn;
+  const JORN_ACTUAL = DATA.jornActual;
+  const TEMPORADA   = DATA.temporada;
+  const JORNADAS    = DATA.jornadas;
+
+
+
+  // ── Helpers ───────────────────────────────────────────────────
+  function fechaJornada(num) {
+    const anio = parseInt(TEMPORADA.split('-')[0]);
+    const inicio = new Date(anio, 7, 9); // 9 agosto
+    inicio.setDate(inicio.getDate() + (num - 1) * 7);
+    return inicio.toLocaleDateString('es-ES', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+  }
+
+  function escudoHTML(abr) {
+    return `<img class="escudo-sm" src="${DATA.staticBase}${abr}.png" alt="${abr}">`;
+  }
+
+  // ── Estado ────────────────────────────────────────────────────
+  let jornadaActual = Math.max(1, Math.min(DATA.jornadaIni, TOTAL_JORN));
+
+  // ── Render dots ───────────────────────────────────────────────
+  function renderDots() {
+    const cont = document.getElementById('dots-container');
+    cont.innerHTML = '';
+    JORNADAS.forEach(j => {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      if (j.num === jornadaActual) dot.classList.add('actual');
+      else if (j.disputada)        dot.classList.add('disputada');
+      else                         dot.classList.add('pendiente');
+      dot.title = `Jornada ${j.num}`;
+      dot.addEventListener('click', () => { jornadaActual = j.num; render(); });
+      cont.appendChild(dot);
+    });
+  }
+
+  // ── Render jornada ────────────────────────────────────────────
+  function render() {
+    const j = JORNADAS.find(x => x.num === jornadaActual);
+
+    // Cabecera
+    document.getElementById('lbl-jornada').textContent = `Jornada ${jornadaActual}`;
+    document.getElementById('lbl-fecha').textContent = fechaJornada(jornadaActual);
+
+    const badge = document.getElementById('lbl-badge');
+    if (j && j.disputada) {
+      badge.innerHTML = '<span class="jornada-badge badge-disputada">Disputada</span>';
+    } else if (jornadaActual === JORN_ACTUAL) {
+      badge.innerHTML = '<span class="jornada-badge badge-actual">Pr&oacute;xima</span>';
+    } else {
+      badge.innerHTML = '<span class="jornada-badge badge-pendiente">Pendiente</span>';
+    }
+
+    // Botones prev/next
+    document.getElementById('btn-prev').disabled = jornadaActual <= 1;
+    document.getElementById('btn-next').disabled = jornadaActual >= TOTAL_JORN;
+
+    // Partidos
+    const cont = document.getElementById('partidos-container');
+    cont.innerHTML = '';
+
+    if (!j || j.partidos.length === 0) {
+      cont.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:40px;font-family:Oswald,sans-serif;letter-spacing:2px;font-size:13px;">SIN DATOS PARA ESTA JORNADA</div>';
+      renderDots();
+      return;
+    }
+
+    j.partidos.forEach(p => {
+      const esMiPartido = p.local === MI_EQUIPO || p.visitante === MI_EQUIPO;
+      const card = document.createElement('div');
+      card.className = 'partido-card' + (esMiPartido ? ' mi-partido' : '');
+
+      let marcadorHTML;
+      if (p.jugado && p.golesLocal !== null) {
+        // Colores de resultado desde perspectiva del mi equipo
+        let claseLocal = '', claseVisit = '';
+        if (esMiPartido) {
+          const yoLocal = p.local === MI_EQUIPO;
+          const miGol = yoLocal ? p.golesLocal : p.golesVisitante;
+          const suGol = yoLocal ? p.golesVisitante : p.golesLocal;
+          const res = miGol > suGol ? 'win' : miGol < suGol ? 'lose' : 'draw';
+          claseLocal  = yoLocal ? res : (res === 'win' ? 'lose' : res === 'lose' ? 'win' : 'draw');
+          claseVisit  = !yoLocal ? res : (res === 'win' ? 'lose' : res === 'lose' ? 'win' : 'draw');
+        }
+        marcadorHTML = `
+          <div class="marcador">
+            <div class="gol ${claseLocal}">${p.golesLocal}</div>
+            <div class="gol-sep">-</div>
+            <div class="gol ${claseVisit}">${p.golesVisitante}</div>
+          </div>`;
+      } else {
+        marcadorHTML = `<div class="marcador"><span class="marcador-pendiente">vs</span></div>`;
+      }
+
+      const esLocalMiEquipo    = p.local === MI_EQUIPO ? ' mi-equipo' : '';
+      const esVisitanteMiEquipo = p.visitante === MI_EQUIPO ? ' mi-equipo' : '';
+
+      card.innerHTML = `
+        <div class="equipo-local">
+          <span class="equipo-nombre${esLocalMiEquipo}">${p.local}</span>
+          ${escudoHTML(p.localAbr)}
+        </div>
+        ${marcadorHTML}
+        <div class="equipo-visitante">
+          ${escudoHTML(p.visitanteAbr)}
+          <span class="equipo-nombre${esVisitanteMiEquipo}">${p.visitante}</span>
+        </div>`;
+
+      cont.appendChild(card);
+    });
+
+    renderDots();
+  }
+
+  // ── Eventos ───────────────────────────────────────────────────
+  document.getElementById('btn-prev').addEventListener('click', () => {
+    if (jornadaActual > 1) { jornadaActual--; render(); }
+  });
+  document.getElementById('btn-next').addEventListener('click', () => {
+    if (jornadaActual < TOTAL_JORN) { jornadaActual++; render(); }
+  });
+
+  // Teclado: flechas izquierda/derecha
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft'  && jornadaActual > 1)         { jornadaActual--; render(); }
+    if (e.key === 'ArrowRight' && jornadaActual < TOTAL_JORN) { jornadaActual++; render(); }
+  });
+
+  // ── Render inicial ────────────────────────────────────────────
+  console.log('FutMaster DEBUG — JORNADAS cargadas:', JORNADAS.length, '| jornadaIni:', JORNADA_INI, '| totalJorn:', TOTAL_JORN);
+  if (JORNADAS.length > 0) console.log('Primera jornada:', JORNADAS[0]);
+  render();
+</script>
+</body>
+</html>

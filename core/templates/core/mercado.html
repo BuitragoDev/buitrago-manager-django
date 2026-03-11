@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutMaster &mdash; Fichajes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:   #080c12;
+    --bg-panel:  #0d1520;
+    --bg-card:   #111c2d;
+    --bg-hover:  #162234;
+    --border:    #1e304a;
+    --border-lit:#2a4668;
+    --accent:    #00d4ff;
+    --text-pri:  #eaf2fb;
+    --text-sec:  #8ab0cc;
+    --text-dim:  #3d5a75;
+    --green:     #00c875;
+    --red:       #ff3d5a;
+    --yellow:    #ffc337;
+    --por-color: #f59e0b;
+    --def-color: #3b82f6;
+    --med-color: #10b981;
+    --del-color: #ef4444;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg-deep); color: var(--text-pri);
+    display: flex; flex-direction: column;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0,80,160,.18) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,74,.15) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,74,.08) 40px);
+  }
+
+  /* ══ TOPBAR ══ */
+  .topbar {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #090f1a 0%, #0e1b2a 100%);
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center;
+    height: 64px; padding: 0 24px;
+    box-shadow: 0 2px 24px rgba(0,0,0,.8); z-index: 100;
+  }
+  .topbar-logo {
+    font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    padding-right: 28px; border-right: 1px solid var(--border);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .topbar-team {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 28px; border-right: 1px solid var(--border); flex-shrink: 0;
+  }
+  .escudo-top { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+  .team-name   { font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 600; letter-spacing: 1px; color: var(--text-pri); line-height: 1.1; }
+  .team-league { font-size: 12px; color: var(--text-sec); text-transform: uppercase; letter-spacing: .8px; }
+  .topbar-stat { display: flex; flex-direction: column; padding: 0 28px; border-right: 1px solid var(--border); gap: 1px; flex-shrink: 0; }
+  .topbar-stat .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); }
+  .topbar-stat .val { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 500; color: var(--text-pri); letter-spacing: .5px; line-height: 1.1; }
+  .val-accent { color: var(--accent) !important; }
+  .topbar-spacer { flex: 1; }
+  .topbar-nav { display: flex; gap: 5px; flex-shrink: 0; }
+  .nav-btn {
+    padding: 7px 13px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-sec);
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 500;
+    letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; border-radius: 3px; transition: all .18s;
+    text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap;
+  }
+  .nav-btn:hover  { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.06); }
+  .nav-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.12); }
+
+  /* ══ MAIN ══ */
+  .main {
+    flex: 1; min-height: 0; overflow: hidden;
+    padding: 16px 28px 14px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .page-header { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+  .page-header h1 {
+    font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--text-pri);
+  }
+  .page-header .sub { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; }
+  .title-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-lit), transparent); }
+
+  /* Info banner de mi equipo */
+  .info-banner {
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 24px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 20px;
+  }
+  .info-item { display: flex; flex-direction: column; gap: 2px; }
+  .info-item .lbl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); }
+  .info-item .val { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 600; color: var(--text-pri); }
+  .info-sep { width: 1px; height: 32px; background: var(--border); }
+  .info-spacer { flex: 1; }
+  .limite-ok      { color: var(--green) !important; }
+  .limite-warning { color: var(--yellow) !important; }
+  .limite-lleno   { color: var(--red) !important; }
+
+  /* ══ TABLA ══ */
+  .tabla-wrap {
+    flex: 1; min-height: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /*
+    # | Nombre+Equipo | DEM | VEL | REG | PAS | DIS | DEF | FIS | POR | MEDIA | DIFICULTAD | ACCION
+   38 | 200           | 58  | 52  | 52  | 52  | 52  | 52  | 52  | 52  | 64    | 120        | 140
+  */
+  .t-grid {
+    display: grid;
+    grid-template-columns: 38px 200px 58px 52px 52px 52px 52px 52px 52px 52px 64px 120px 140px;
+    align-items: center;
+    padding: 0 12px;
+  }
+
+  .t-head {
+    flex-shrink: 0; height: 30px;
+    background: rgba(255,255,255,.022);
+    border-bottom: 2px solid var(--border);
+  }
+  .th {
+    font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 600;
+    letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-dim);
+    text-align: center; white-space: nowrap;
+  }
+  .th.left { text-align: left; }
+  .th.sep, .td.sep { border-left: 1px solid var(--border); }
+
+  .t-body { flex: 1; min-height: 0; overflow-y: auto; }
+  .t-body::-webkit-scrollbar { width: 5px; }
+  .t-body::-webkit-scrollbar-track { background: var(--bg-card); }
+  .t-body::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 3px; }
+
+  .t-row {
+    height: 44px;
+    border-bottom: 1px solid rgba(30,48,74,.3);
+    transition: background .1s;
+  }
+  .t-row:last-child { border-bottom: none; }
+  .t-row:hover { background: var(--bg-hover); }
+  .t-row.fichado { opacity: .4; }
+
+  /* Nº */
+  .num { font-family: 'Oswald', sans-serif; font-size: 12px; color: var(--text-dim); text-align: center; }
+
+  /* Nombre + equipo */
+  .jugador-cell { display: flex; flex-direction: column; gap: 1px; min-width: 0; overflow: hidden; }
+  .jugador-nombre {
+    font-size: 13px; font-weight: 600; color: var(--text-pri);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .jugador-equipo {
+    font-size: 10px; color: var(--text-dim);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .escudo-xs { width: 14px; height: 14px; object-fit: contain; flex-shrink: 0; vertical-align: middle; }
+
+  /* Badge demarcación */
+  .dem-badge {
+    font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
+    letter-spacing: 1.5px; padding: 2px 6px; border-radius: 3px; color: #fff;
+    display: inline-block; text-align: center;
+  }
+  .badge-por { background: var(--por-color); }
+  .badge-def { background: var(--def-color); }
+  .badge-med { background: var(--med-color); }
+  .badge-del { background: var(--del-color); }
+
+  /* Atributos */
+  .attr { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; text-align: center; color: var(--text-sec); }
+
+  /* Media */
+  .media-val {
+    font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 700;
+    text-align: center;
+  }
+  .media-superior { color: var(--red); }
+  .media-similar  { color: var(--yellow); }
+  .media-inferior { color: var(--green); }
+
+  /* Dificultad */
+  .dif-badge {
+    font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700;
+    letter-spacing: 1px; padding: 3px 8px; border-radius: 3px;
+    display: inline-block; white-space: nowrap;
+  }
+  .dif-muy-dificil { color: #ff3d5a; border: 1px solid #ff3d5a; background: rgba(255,61,90,.1); }
+  .dif-dificil     { color: #ff8c37; border: 1px solid #ff8c37; background: rgba(255,140,55,.1); }
+  .dif-posible     { color: #ffc337; border: 1px solid #ffc337; background: rgba(255,195,55,.1); }
+  .dif-probable    { color: #00c875; border: 1px solid #00c875; background: rgba(0,200,117,.1); }
+  .dif-col { display: flex; align-items: center; justify-content: center; }
+
+  /* Botón fichar */
+  .accion-col { display: flex; align-items: center; justify-content: center; }
+  .btn-fichar {
+    font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    background: linear-gradient(135deg, #0d2a4a, #091a2e);
+    color: var(--accent); border: 1px solid var(--accent);
+    padding: 5px 12px; border-radius: 3px; cursor: pointer;
+    transition: all .18s; white-space: nowrap;
+  }
+  .btn-fichar:hover:not(:disabled) {
+    background: linear-gradient(135deg, #123566, #0d2444);
+    box-shadow: 0 0 12px rgba(0,212,255,.3); transform: translateY(-1px);
+  }
+  .btn-fichar:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+
+  /* Feedback inline */
+  .feedback {
+    font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; padding: 4px 10px; border-radius: 3px;
+    display: none; white-space: nowrap; text-align: center;
+  }
+  .feedback.exito   { color: var(--green); border: 1px solid var(--green); background: rgba(0,200,117,.1); }
+  .feedback.rechazo { color: var(--red);   border: 1px solid var(--red);   background: rgba(255,61,90,.1); }
+  .feedback.limite  { color: var(--yellow); border: 1px solid var(--yellow); background: rgba(255,195,55,.1); }
+
+  /* Toast global */
+  #toast {
+    position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+    background: var(--bg-panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 24px;
+    font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 1px;
+    color: var(--text-pri); box-shadow: 0 8px 32px rgba(0,0,0,.6);
+    opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 999;
+    max-width: 500px; text-align: center;
+  }
+  #toast.show { opacity: 1; }
+
+  /* Footer */
+  footer {
+    flex-shrink: 0; background: var(--bg-panel); border-top: 1px solid var(--border);
+    padding: 7px 24px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-name {
+    font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .footer-ver { font-size: 12px; color: var(--text-dim); }
+  .btn-reset {
+    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-dim); text-decoration: none;
+    border: 1px solid var(--border); padding: 4px 10px; border-radius: 3px; transition: all .18s;
+  }
+  .btn-reset:hover { color: var(--red); border-color: var(--red); background: rgba(255,61,90,.08); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-logo">&#9917; FutMaster</div>
+  <div class="topbar-team">
+    <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
+    <div>
+      <div class="team-name">{{ equipo.nombre }}</div>
+      <div class="team-league">{{ liga.nombre }}</div>
+    </div>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">M&aacute;nager</span>
+    <span class="val">{{ manager.nombre }}</span>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">Jornada</span>
+    <span class="val">{{ liga.jornada_actual }} / {{ liga.jornadas_totales }}</span>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">Fecha</span>
+    <span class="val val-accent">{{ fecha_juego|date:"D d M Y" }}</span>
+  </div>
+  <div class="topbar-spacer"></div>
+  <nav class="topbar-nav">
+    <a href="{% url 'dashboard' %}"        class="nav-btn">Inicio</a>
+    <a href="{% url 'plantilla' %}"        class="nav-btn">Plantilla</a>
+    <a href="{% url 'mercado_fichajes' %}" class="nav-btn active">Fichajes</a>
+    <a href="{% url 'clasificacion' %}"    class="nav-btn">Clasificaci&oacute;n</a>
+    <a href="{% url 'resultados' %}"       class="nav-btn">Resultados</a>
+    <a href="{% url 'estadisticas' %}"     class="nav-btn">Estad&iacute;sticas</a>
+    <a href="{% url 'historico' %}"        class="nav-btn">Hist&oacute;rico</a>
+  </nav>
+</header>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Fichajes</h1>
+    <span class="sub">Mercado de traspasos &middot; {{ liga.temporada }} &middot; {{ ofertas|length }} jugadores disponibles</span>
+    <div class="title-line"></div>
+  </div>
+
+  <!-- BANNER INFO MI EQUIPO -->
+  <div class="info-banner">
+    <div class="info-item">
+      <span class="lbl">Mi plantilla</span>
+      <span class="val {% if jugadores_equipo >= limite_plantilla %}limite-lleno{% elif jugadores_equipo >= 20 %}limite-warning{% else %}limite-ok{% endif %}">
+        {{ jugadores_equipo }} / {{ limite_plantilla }}
+      </span>
+    </div>
+    <div class="info-sep"></div>
+    <div class="info-item">
+      <span class="lbl">Media de mi equipo</span>
+      <span class="val val-accent">{{ media_equipo }}</span>
+    </div>
+    <div class="info-sep"></div>
+    <div class="info-item">
+      <span class="lbl">Dificultad</span>
+      <span class="val" style="font-size:13px; color:var(--text-sec);">
+        Basada en diferencia de nivel + ventana de mercado
+      </span>
+    </div>
+    {% if jugadores_equipo >= limite_plantilla %}
+    <div class="info-sep"></div>
+    <div class="info-item">
+      <span class="lbl">&nbsp;</span>
+      <span class="val" style="color:var(--red); font-size:13px;">&#9888; Plantilla llena &mdash; vende o libera un jugador primero</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- TABLA -->
+  <div class="tabla-wrap">
+    <div class="t-grid t-head">
+      <div class="th">#</div>
+      <div class="th left">Jugador</div>
+      <div class="th">Dem.</div>
+      <div class="th sep">Vel.</div>
+      <div class="th">Reg.</div>
+      <div class="th">Pase</div>
+      <div class="th">Dis.</div>
+      <div class="th">Def.</div>
+      <div class="th">F&iacute;s.</div>
+      <div class="th">Port.</div>
+      <div class="th sep">Media</div>
+      <div class="th sep">Dificultad</div>
+      <div class="th sep">Acci&oacute;n</div>
+    </div>
+
+    <div class="t-body">
+      {% for o in ofertas %}
+      <div class="t-grid t-row"
+           data-oferta-id="{{ o.id }}"
+           data-fichar-url="{% url 'fichar_jugador' o.id %}"
+           data-nombre="{{ o.jugador.nombre }} {{ o.jugador.apellidos }}">
+        <div class="num">{{ forloop.counter }}</div>
+        <div class="jugador-cell">
+          <span class="jugador-nombre">{{ o.jugador.nombre }} {{ o.jugador.apellidos }}</span>
+          <span class="jugador-equipo">
+            <img class="escudo-xs" src="{% static 'core/img/'|add:o.jugador.equipo.abreviatura|add:'.png' %}" alt="{{ o.jugador.equipo.abreviatura }}">
+            {{ o.jugador.equipo.nombre_corto }} &middot; {{ o.jugador.edad }}a
+          </span>
+        </div>
+        <div style="text-align:center">
+          <span class="dem-badge badge-{{ o.jugador.posicion|lower }}">{{ o.jugador.posicion }}</span>
+        </div>
+        <div class="attr sep">{{ o.jugador.velocidad }}</div>
+        <div class="attr">{{ o.jugador.regate }}</div>
+        <div class="attr">{{ o.jugador.pase }}</div>
+        <div class="attr">{{ o.jugador.disparo }}</div>
+        <div class="attr">{{ o.jugador.defensa }}</div>
+        <div class="attr">{{ o.jugador.fisico }}</div>
+        <div class="attr">{{ o.jugador.porteria }}</div>
+        <div class="sep" data-media="{{ o.jugador.media }}">
+          <div class="media-val">{{ o.jugador.media }}</div>
+        </div>
+        <div class="dif-col sep">
+          <span class="dif-badge {{ o.dif_clase }}">{{ o.dif_label }}</span>
+        </div>
+        <div class="accion-col sep">
+          {% if jugadores_equipo >= limite_plantilla %}
+            <span class="dif-badge dif-muy-dificil">PLANTILLA LLENA</span>
+          {% else %}
+            <button class="btn-fichar">INTENTAR FICHAJE</button>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div style="text-align:center; color:var(--text-dim); padding:60px; font-family:Oswald,sans-serif; letter-spacing:2px; font-size:13px;">
+        NO HAY JUGADORES DISPONIBLES EN EL MERCADO
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-name">&#9917; FutMaster</div>
+  <div class="footer-ver">{{ liga.nombre }} {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual }}</div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <div class="footer-ver">Versi&oacute;n 0.1.0 Alpha</div>
+    <a href="{% url 'reset_juego' %}" class="btn-reset"
+       onclick="return confirm('Seguro? Se borraran todos los datos y empezaras desde cero.')">
+      &#8635; Nueva Partida
+    </a>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script type="application/json" id="datos-mercado">
+{
+  "mediaEquipo": {{ media_equipo }},
+  "plantillaLlena": {% if jugadores_equipo >= limite_plantilla %}true{% else %}false{% endif %}
+}
+</script>
+
+<script>
+  const CSRF = (document.cookie.split(';').find(c => c.trim().startsWith('csrftoken=')) || '').split('=')[1] || '';
+  const DATA_MERC = JSON.parse(document.getElementById('datos-mercado').textContent);
+  const MEDIA_EQUIPO = DATA_MERC.mediaEquipo;
+
+  // Escudos
+
+
+  // Color media según diferencia con mi equipo
+  document.querySelectorAll('[data-media]').forEach(el => {
+    const media = parseFloat(el.getAttribute('data-media'));
+    const diff  = media - MEDIA_EQUIPO;
+    const div   = el.querySelector('.media-val');
+    if (diff >= 6)        div.classList.add('media-superior');
+    else if (diff >= -3)  div.classList.add('media-similar');
+    else                  div.classList.add('media-inferior');
+  });
+
+  // Toast
+  let toastTimer;
+  function mostrarToast(msg, tipo) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.borderColor = tipo === 'exito' ? 'var(--green)' : tipo === 'rechazo' ? 'var(--red)' : 'var(--yellow)';
+    t.style.color = tipo === 'exito' ? 'var(--green)' : tipo === 'rechazo' ? 'var(--red)' : 'var(--yellow)';
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  // Botones fichar
+  document.querySelectorAll('.btn-fichar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const row    = btn.closest('.t-row');
+      const url    = row.getAttribute('data-fichar-url');
+      const nombre = row.getAttribute('data-nombre');
+
+      btn.disabled = true;
+      btn.textContent = '...';
+
+      fetch(url, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' }
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d.tipo === 'exito') {
+          btn.textContent = '✓ FICHADO';
+          btn.style.color = 'var(--green)';
+          btn.style.borderColor = 'var(--green)';
+          row.classList.add('fichado');
+          mostrarToast('¡' + nombre + ' fichado!', 'exito');
+        } else if (d.tipo === 'limite') {
+          btn.disabled = false;
+          btn.textContent = 'INTENTAR FICHAJE';
+          mostrarToast(d.mensaje, 'limite');
+        } else {
+          // rechazo — la oferta desaparece, solo había una oportunidad
+          mostrarToast('Rechazado: ' + d.mensaje, 'rechazo');
+          setTimeout(() => {
+            row.style.transition = 'opacity .5s';
+            row.style.opacity = '0';
+            setTimeout(() => row.remove(), 500);
+          }, 1200); // esperar a que el usuario lea el toast
+        }
+      })
+      .catch(() => {
+        btn.disabled = false;
+        btn.textContent = 'INTENTAR FICHAJE';
+        mostrarToast('Error de conexión', 'rechazo');
+      });
+    });
+  });
+</script>
+</body>
+</html>

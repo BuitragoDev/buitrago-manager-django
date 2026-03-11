@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutMaster &mdash; Clasificaci&oacute;n</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:    #080c12;
+    --bg-panel:   #0d1520;
+    --bg-card:    #111c2d;
+    --bg-hover:   #162234;
+    --border:     #1e304a;
+    --border-lit: #2a4668;
+    --accent:     #00d4ff;
+    --accent2:    #ff6b35;
+    --gold:       #ffc337;
+    --silver:     #c0c8d0;
+    --bronze:     #cd7f32;
+    --text-pri:   #eaf2fb;
+    --text-sec:   #8ab0cc;
+    --text-dim:   #3d5a75;
+    --green:      #00c875;
+    --red:        #ff3d5a;
+    --yellow:     #ffc337;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-pri);
+    display: flex; flex-direction: column;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0,80,160,.18) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,74,.15) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,74,.08) 40px);
+  }
+
+  /* ══════ TOP BAR */
+  .topbar {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #090f1a 0%, #0e1b2a 100%);
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center;
+    height: 64px; padding: 0 24px;
+    box-shadow: 0 2px 24px rgba(0,0,0,.8);
+    z-index: 100;
+  }
+  .topbar-logo {
+    font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    padding-right: 28px; border-right: 1px solid var(--border);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .topbar-team {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 28px; border-right: 1px solid var(--border); flex-shrink: 0;
+  }
+  .escudo-top { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+  .team-name { font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 600; letter-spacing: 1px; color: var(--text-pri); line-height: 1.1; }
+  .team-league { font-size: 12px; color: var(--text-sec); text-transform: uppercase; letter-spacing: .8px; }
+  .topbar-stat { display: flex; flex-direction: column; padding: 0 28px; border-right: 1px solid var(--border); gap: 1px; flex-shrink: 0; }
+  .topbar-stat .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); }
+  .topbar-stat .val { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 500; color: var(--text-pri); letter-spacing: .5px; line-height: 1.1; }
+  .val-accent { color: var(--accent) !important; }
+  .topbar-spacer { flex: 1; }
+  .topbar-nav { display: flex; gap: 5px; flex-shrink: 0; }
+  .nav-btn {
+    padding: 7px 13px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-sec);
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 500;
+    letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; border-radius: 3px; transition: all .18s;
+    text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap;
+  }
+  .nav-btn:hover  { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.06); }
+  .nav-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.12); }
+
+  /* ══════ MAIN */
+  .main {
+    flex: 1; overflow: hidden;
+    padding: 18px 28px 12px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  .page-title {
+    display: flex; align-items: baseline; gap: 14px; flex-shrink: 0;
+  }
+  .page-title h1 {
+    font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--text-pri);
+  }
+  .page-title .sub { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; }
+  .title-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-lit), transparent); margin-bottom: 3px; }
+
+  /* ══════ LAYOUT */
+  .clas-layout {
+    flex: 1; min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 18px;
+  }
+
+  /* ══════ TABLA */
+  .tabla-wrap {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .tabla-header {
+    display: grid;
+    grid-template-columns: 38px 32px 1fr 42px 42px 42px 42px 42px 42px 52px 58px;
+    padding: 7px 14px;
+    background: rgba(255,255,255,.03);
+    border-bottom: 2px solid var(--border);
+    flex-shrink: 0;
+  }
+  .th {
+    font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+    text-align: center;
+  }
+  .th.left { text-align: left; }
+
+  .tabla-body { flex: 1; overflow-y: auto; }
+  .tabla-body::-webkit-scrollbar { width: 4px; }
+  .tabla-body::-webkit-scrollbar-track { background: var(--bg-card); }
+  .tabla-body::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 2px; }
+
+  /* Fila compacta: altura reducida */
+  .fila {
+    display: grid;
+    grid-template-columns: 38px 32px 1fr 42px 42px 42px 42px 42px 42px 52px 58px;
+    padding: 0 14px;
+    height: 34px;
+    align-items: center;
+    border-bottom: 1px solid rgba(30,48,74,.4);
+    transition: background .12s;
+  }
+  .fila:hover { background: var(--bg-hover); }
+  .fila.mi-equipo {
+    background: rgba(0,212,255,.07);
+    border-left: 3px solid var(--accent);
+  }
+  .fila.mi-equipo:hover { background: rgba(0,212,255,.11); }
+  .fila.sep-desc { border-top: 2px solid rgba(255,61,90,.4); }
+
+  .td { text-align: center; }
+  .td.left { text-align: left; }
+
+  /* Posición */
+  .pos {
+    font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700;
+    text-align: center; width: 24px; display: inline-block;
+  }
+  .pos-1    { color: var(--gold); }
+  .pos-2    { color: var(--silver); }
+  .pos-nor  { color: var(--text-dim); }
+  .pos-desc { color: var(--red); }
+
+  /* Escudo */
+  .escudo-sm { width: 22px; height: 22px; object-fit: contain; }
+
+  .club-info { display: flex; align-items: center; gap: 8px; }
+  .club-nombre {
+    font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600;
+    color: var(--text-pri); letter-spacing: .3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .fila.mi-equipo .club-nombre { color: var(--accent); }
+
+  .td-num {
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 500;
+    text-align: center; color: var(--text-sec);
+  }
+  .td-dif {
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600;
+    text-align: center;
+  }
+  .dif-pos { color: var(--green); }
+  .dif-neg { color: var(--red); }
+  .dif-neu { color: var(--text-dim); }
+
+  .td-pts {
+    font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700;
+    text-align: center; color: var(--text-pri);
+  }
+  .fila.mi-equipo .td-pts { color: var(--accent); }
+
+  /* ══════ LATERAL */
+  .lateral { display: flex; flex-direction: column; gap: 12px; }
+
+  .card-side {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .side-title {
+    font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--text-sec);
+    padding: 8px 14px; background: rgba(255,255,255,.025);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ic { color: var(--accent); }
+
+  /* Leyenda */
+  .leyenda-list { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
+  .leyenda-item { display: flex; align-items: center; gap: 10px; }
+  .leyenda-color { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .lc-campeon  { background: var(--gold); }
+  .lc-sub      { background: var(--silver); }
+  .lc-desc     { background: var(--red); }
+  .leyenda-txt { font-size: 13px; color: var(--text-sec); flex: 1; }
+  .leyenda-pos { font-family: 'Oswald', sans-serif; font-size: 12px; color: var(--text-dim); }
+
+  /* Mi equipo */
+  .mi-resumen { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
+  .resumen-fila { display: flex; align-items: center; justify-content: space-between; }
+  .res-lbl { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .7px; }
+  .res-val { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-pri); }
+  .res-val.bueno  { color: var(--green); }
+  .res-val.malo   { color: var(--red); }
+  .res-val.accent { color: var(--accent); }
+
+  /* Liga */
+  .stats-list { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .stat-item  { display: flex; align-items: center; justify-content: space-between; }
+  .stat-lbl   { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .7px; }
+  .stat-val   { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-pri); }
+  .stat-val.accent { color: var(--accent); }
+
+  /* Footer */
+  footer {
+    flex-shrink: 0; background: var(--bg-panel); border-top: 1px solid var(--border);
+    padding: 7px 24px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-name {
+    font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .footer-ver  { font-size: 12px; color: var(--text-dim); }
+  .btn-reset {
+    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-dim); text-decoration: none;
+    border: 1px solid var(--border); padding: 4px 10px; border-radius: 3px;
+    transition: all .18s;
+  }
+  .btn-reset:hover { color: var(--red); border-color: var(--red); background: rgba(255,61,90,.08); }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-logo">&#9917; FutMaster</div>
+  <div class="topbar-team">
+    <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
+    <div>
+      <div class="team-name">{{ equipo.nombre }}</div>
+      <div class="team-league">{{ liga.nombre }}</div>
+    </div>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">M&aacute;nager</span>
+    <span class="val">{{ manager.nombre }}</span>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">Jornada</span>
+    <span class="val">{{ liga.jornada_actual }} / {{ liga.jornadas_totales }}</span>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">Fecha</span>
+    <span class="val val-accent">{{ fecha_juego|date:"D d M Y" }}</span>
+  </div>
+  <div class="topbar-spacer"></div>
+  <nav class="topbar-nav">
+    <a href="{% url 'dashboard' %}"        class="nav-btn">Inicio</a>
+    <a href="{% url 'plantilla' %}"        class="nav-btn">Plantilla</a>
+    <a href="{% url 'mercado_fichajes' %}" class="nav-btn">Fichajes</a>
+    <a href="{% url 'clasificacion' %}"    class="nav-btn active">Clasificaci&oacute;n</a>
+    <a href="{% url 'resultados' %}"       class="nav-btn">Resultados</a>
+    <a href="{% url 'estadisticas' %}"     class="nav-btn">Estad&iacute;sticas</a>
+    <a href="{% url 'historico' %}"        class="nav-btn">Hist&oacute;rico</a>
+  </nav>
+</header>
+
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="page-title">
+    <h1>Clasificaci&oacute;n</h1>
+    <span class="sub">{{ liga.nombre }} &middot; {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual|add:"-1" }}</span>
+    <div class="title-line"></div>
+  </div>
+
+  <div class="clas-layout">
+
+    <!-- TABLA -->
+    <div class="tabla-wrap">
+      <div class="tabla-header">
+        <div class="th">#</div>
+        <div class="th"></div>
+        <div class="th left">Club</div>
+        <div class="th">PJ</div>
+        <div class="th">PG</div>
+        <div class="th">PE</div>
+        <div class="th">PP</div>
+        <div class="th">GF</div>
+        <div class="th">GC</div>
+        <div class="th">DIF</div>
+        <div class="th">PTS</div>
+      </div>
+
+      <div class="tabla-body">
+        {% for c in tabla %}
+        <div class="fila {% if c.equipo == equipo %}mi-equipo {% endif %}{% if c.pos == 18 %}sep-desc{% endif %}">
+
+          <!-- Posición -->
+          <div class="td">
+            <span class="pos
+              {% if c.pos == 1 %}pos-1
+              {% elif c.pos == 2 %}pos-2
+              {% elif c.pos >= 18 %}pos-desc
+              {% else %}pos-nor
+              {% endif %}">{{ c.pos }}</span>
+          </div>
+
+          <!-- Escudo -->
+          <div class="td">
+            <img class="escudo-sm" src="{% static 'core/img/'|add:c.equipo.abreviatura|add:'.png' %}" alt="{{ c.equipo.abreviatura }}">
+          </div>
+
+          <!-- Club -->
+          <div class="td left">
+            <span class="club-nombre">{{ c.equipo.nombre_corto }}</span>
+          </div>
+
+          <!-- Stats -->
+          <div class="td td-num">{{ c.partidos_jugados }}</div>
+          <div class="td td-num">{{ c.partidos_ganados }}</div>
+          <div class="td td-num">{{ c.partidos_empatados }}</div>
+          <div class="td td-num">{{ c.partidos_perdidos }}</div>
+          <div class="td td-num">{{ c.goles_favor }}</div>
+          <div class="td td-num">{{ c.goles_contra }}</div>
+
+          <!-- Diferencia -->
+          <div class="td td-dif
+            {% if c.diferencia_goles > 0 %}dif-pos
+            {% elif c.diferencia_goles < 0 %}dif-neg
+            {% else %}dif-neu
+            {% endif %}">
+            {% if c.diferencia_goles > 0 %}+{% endif %}{{ c.diferencia_goles }}
+          </div>
+
+          <!-- Puntos -->
+          <div class="td td-pts">{{ c.puntos }}</div>
+
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- LATERAL -->
+    <div class="lateral">
+
+      <!-- Leyenda -->
+      <div class="card-side">
+        <div class="side-title"><span class="ic">&#9632;</span> Zonas</div>
+        <div class="leyenda-list">
+          <div class="leyenda-item">
+            <div class="leyenda-color lc-campeon"></div>
+            <span class="leyenda-txt">Campe&oacute;n</span>
+            <span class="leyenda-pos">1&ordm;</span>
+          </div>
+          <div class="leyenda-item">
+            <div class="leyenda-color lc-sub"></div>
+            <span class="leyenda-txt">Subcampe&oacute;n</span>
+            <span class="leyenda-pos">2&ordm;</span>
+          </div>
+          <div class="leyenda-item">
+            <div class="leyenda-color lc-desc"></div>
+            <span class="leyenda-txt">Descenso</span>
+            <span class="leyenda-pos">18&ordm; &ndash; 20&ordm;</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mi equipo -->
+      <div class="card-side">
+        <div class="side-title"><span class="ic">&#9917;</span> {{ equipo.nombre_corto }}</div>
+        <div class="mi-resumen">
+          {% for c in tabla %}{% if c.equipo == equipo %}
+          <div class="resumen-fila">
+            <span class="res-lbl">Posici&oacute;n</span>
+            <span class="res-val accent">{{ c.pos }}&#176;</span>
+          </div>
+          <div class="resumen-fila">
+            <span class="res-lbl">Puntos</span>
+            <span class="res-val accent">{{ c.puntos }}</span>
+          </div>
+          <div class="resumen-fila">
+            <span class="res-lbl">Jugados</span>
+            <span class="res-val">{{ c.partidos_jugados }}</span>
+          </div>
+          <div class="resumen-fila">
+            <span class="res-lbl">Victorias</span>
+            <span class="res-val bueno">{{ c.partidos_ganados }}</span>
+          </div>
+          <div class="resumen-fila">
+            <span class="res-lbl">Empates</span>
+            <span class="res-val">{{ c.partidos_empatados }}</span>
+          </div>
+          <div class="resumen-fila">
+            <span class="res-lbl">Derrotas</span>
+            <span class="res-val malo">{{ c.partidos_perdidos }}</span>
+          </div>
+          <div class="resumen-fila">
+            <span class="res-lbl">GF / GC</span>
+            <span class="res-val">{{ c.goles_favor }} / {{ c.goles_contra }}</span>
+          </div>
+          <div class="resumen-fila">
+            <span class="res-lbl">Diferencia</span>
+            <span class="res-val {% if c.diferencia_goles >= 0 %}bueno{% else %}malo{% endif %}">
+              {% if c.diferencia_goles > 0 %}+{% endif %}{{ c.diferencia_goles }}
+            </span>
+          </div>
+          {% endif %}{% endfor %}
+        </div>
+      </div>
+
+      <!-- Liga -->
+      <div class="card-side">
+        <div class="side-title"><span class="ic">&#128202;</span> Liga</div>
+        <div class="stats-list">
+          <div class="stat-item">
+            <span class="stat-lbl">L&iacute;der</span>
+            <span class="stat-val accent">
+              {% for c in tabla %}{% if c.pos == 1 %}{{ c.equipo.nombre_corto }}{% endif %}{% endfor %}
+            </span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-lbl">Jornada</span>
+            <span class="stat-val">{{ liga.jornada_actual }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-name">&#9917; FutMaster</div>
+  <div class="footer-ver">{{ liga.nombre }} {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual }}</div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <div class="footer-ver">Versi&oacute;n 0.1.0 Alpha</div>
+    <a href="{% url 'reset_juego' %}"
+       class="btn-reset"
+       onclick="return confirm('Seguro? Se borraran todos los datos y empezaras desde cero.')">
+      &#8635; Nueva Partida
+    </a>
+  </div>
+</footer>
+
+<script>
+
+</script>
+
+</body>
+</html>

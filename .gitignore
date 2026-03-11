@@ -1,0 +1,24 @@
+# Entorno virtual
+venv/
+
+# Base de datos (datos locales, no van al repo)
+db.sqlite3
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Django
+*.log
+local_settings.py
+
+# IDE
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
+Thumbs.db

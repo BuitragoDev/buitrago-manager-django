@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buitrago Manager &mdash; {{ equipo.nombre_corto }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #080c12;
+      --bg-panel: #0d1520;
+      --bg-card: #111c2d;
+      --bg-hover: #162234;
+      --border: #1e304a;
+      --border-lit: #2a4668;
+      --accent: #00d4ff;
+      --accent2: #ff6b35;
+      --accent3: #00ff87;
+      --gold: #ffc337;
+      --text-pri: #eaf2fb;
+      --text-sec: #8ab0cc;
+      --text-dim: #3d5a75;
+      --green: #00c875;
+      --red: #ff3d5a;
+      --yellow: #ffc337;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-pri);
+      display: flex;
+      flex-direction: column;
+      background-image:
+        radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0, 80, 160, .18) 0%, transparent 70%),
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30, 48, 74, .15) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30, 48, 74, .08) 40px);
+    }
+
+    /* ══════ TOP BAR */
+    .topbar {
+      flex-shrink: 0;
+      z-index: 100;
+      background: linear-gradient(135deg, #090f1a 0%, #0e1b2a 100%);
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      height: 64px;
+      padding: 0 24px;
+      box-shadow: 0 2px 24px rgba(0, 0, 0, .8);
+    }
+
+    .topbar-logo {
+      font-family: 'Oswald', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--accent), #0095c8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      padding-right: 28px;
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity .18s;
+    }
+    .topbar-logo:hover { opacity: .75; }
+
+    .topbar-team {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 28px;
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .escudo-top {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .team-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--text-pri);
+      line-height: 1.1;
+    }
+
+    .team-league {
+      font-size: 12px;
+      color: var(--text-sec);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+
+    .topbar-stat {
+      display: flex;
+      flex-direction: column;
+      padding: 0 28px;
+      border-right: 1px solid var(--border);
+      gap: 1px;
+      flex-shrink: 0;
+    }
+
+    .topbar-stat .lbl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+    }
+
+    .topbar-stat .val {
+      font-family: 'Oswald', sans-serif;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-pri);
+      letter-spacing: .5px;
+      line-height: 1.1;
+    }
+
+    .val-accent {
+      color: var(--accent) !important;
+    }
+
+    .topbar-spacer {
+      flex: 1;
+    }
+
+    .topbar-nav {
+      display: flex;
+      gap: 5px;
+      margin-right: 20px;
+      flex-shrink: 0;
+    }
+
+    .nav-btn {
+      padding: 7px 13px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-sec);
+      font-family: 'Oswald', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all .18s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0, 212, 255, .06);
+    }
+
+    .nav-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0, 212, 255, .12);
+    }
+
+    /* Botón principal: cambia según si hay partido o no */
+    .btn-accion {
+      padding: 11px 28px;
+      border: none;
+      color: #fff;
+      font-family: 'Oswald', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all .2s;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .btn-accion::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, .18) 0%, transparent 55%);
+    }
+
+    .btn-accion:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-simular {
+      background: linear-gradient(135deg, var(--accent2) 0%, #d03c14 100%);
+      box-shadow: 0 4px 20px rgba(255, 107, 53, .4);
+    }
+
+    .btn-simular:hover {
+      box-shadow: 0 6px 26px rgba(255, 107, 53, .55);
+    }
+
+    .btn-continuar {
+      background: linear-gradient(135deg, #1a7a3a 0%, #0e5228 100%);
+      box-shadow: 0 4px 20px rgba(0, 200, 117, .25);
+    }
+
+    .btn-continuar:hover {
+      box-shadow: 0 6px 26px rgba(0, 200, 117, .4);
+    }
+
+    /* ══════ MAIN */
+    .main {
+      flex: 1;
+      overflow: hidden;
+      padding: 14px 20px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    /* ══════ PARTIDOS ROW */
+    .partidos-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      z-index: 1;
+    }
+
+    .card.ultimo::before {
+      background: linear-gradient(90deg, var(--accent3), transparent);
+    }
+
+    .card.proximo::before {
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, .025);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tag {
+      font-family: 'Oswald', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 2px;
+    }
+
+    .tag-ultimo {
+      background: rgba(0, 255, 135, .12);
+      color: var(--accent3);
+    }
+
+    .tag-proximo {
+      background: rgba(0, 212, 255, .12);
+      color: var(--accent);
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-sec);
+    }
+
+    .meta-comp {
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-pri);
+    }
+
+    .partido-body {
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .equipo-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .escudo-partido {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, .4));
+    }
+
+    .nombre-eq {
+      font-family: 'Oswald', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      color: var(--text-pri);
+      text-transform: uppercase;
+    }
+
+    .nombre-eq.mio {
+      color: var(--accent);
+    }
+
+    .marcador-centro {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .marcador-num {
+      font-family: 'Oswald', sans-serif;
+      font-size: 46px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      line-height: 1;
+      color: var(--text-pri);
+    }
+
+    .marcador-num.win {
+      color: var(--green);
+    }
+
+    .marcador-num.draw {
+      color: var(--yellow);
+    }
+
+    .marcador-num.lose {
+      color: var(--red);
+    }
+
+    .marcador-vs {
+      font-family: 'Oswald', sans-serif;
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: 6px;
+      color: var(--text-dim);
+    }
+
+    .result-badge {
+      font-family: 'Oswald', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      padding: 3px 12px;
+      border-radius: 2px;
+    }
+
+    .badge-win {
+      background: rgba(0, 200, 117, .15);
+      color: var(--green);
+    }
+
+    .badge-draw {
+      background: rgba(255, 195, 55, .15);
+      color: var(--yellow);
+    }
+
+    .badge-lose {
+      background: rgba(255, 61, 90, .15);
+      color: var(--red);
+    }
+
+    .proximo-jornada {
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--accent);
+      text-align: center;
+    }
+
+    .partido-footer {
+      padding: 7px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-sec);
+    }
+
+    /* ══════ BOTTOM ROW */
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 310px 1fr 290px;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .section-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--text-sec);
+      padding: 9px 14px;
+      background: rgba(255, 255, 255, .025);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .ic {
+      color: var(--accent);
+      transition: opacity .15s, transform .15s;
+    }
+    .ic:hover { opacity: .7; transform: scale(1.15); }
+
+    /* Clasificación */
+    .card-clas {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .clas-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .clas-table thead tr {
+      background: rgba(255, 255, 255, .02);
+    }
+
+    .clas-table th {
+      font-family: 'Oswald', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 5px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .clas-table th:last-child {
+      text-align: right;
+      padding-right: 14px;
+    }
+
+    .clas-table tbody tr {
+      border-bottom: 1px solid rgba(30, 48, 74, .4);
+      transition: background .12s;
+    }
+
+    .clas-table tbody tr:hover {
+      background: var(--bg-hover);
+    }
+
+    .clas-table tbody tr.mi-fila {
+      background: rgba(0, 212, 255, .07);
+      border-left: 2px solid var(--accent);
+    }
+
+    .clas-table td {
+      padding: 4px 10px;
+      font-size: 13px;
+      color: var(--text-pri);
+    }
+
+    .clas-table td:last-child {
+      text-align: right;
+      padding-right: 14px;
+    }
+
+    .pos-num {
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      width: 22px;
+      text-align: center;
+      display: inline-block;
+    }
+
+    .p1 {
+      color: var(--gold);
+    }
+
+    .p2 {
+      color: #c0c8d0;
+    }
+
+    .p3 {
+      color: #cd7f32;
+    }
+
+    .peur {
+      color: var(--green);
+    }
+
+    .prel {
+      color: var(--red);
+    }
+
+    .escudo-xs {
+      width: 17px;
+      height: 17px;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+
+    .nombre-club {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .pts {
+      font-family: 'Oswald', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .mi-fila .pts {
+      color: var(--accent);
+    }
+
+    .sep-row td {
+      padding: 0 !important;
+      height: 1px;
+    }
+
+    .sep-eur {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(0, 200, 117, .5), transparent);
+    }
+
+    .sep-rel {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255, 61, 90, .5), transparent);
+    }
+
+    /* Noticias */
+    .card-news {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .news-scroll {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    .news-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .news-scroll::-webkit-scrollbar-track {
+      background: var(--bg-card);
+    }
+
+    .news-scroll::-webkit-scrollbar-thumb {
+      background: var(--border-lit);
+      border-radius: 3px;
+    }
+
+    .news-scroll::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    .noticia {
+      padding: 11px 14px 11px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      transition: background .12s, opacity .25s, transform .25s;
+    }
+
+    .noticia:hover {
+      background: var(--bg-hover);
+    }
+
+    .noticia.removing {
+      opacity: 0;
+      transform: translateX(12px);
+    }
+
+    .noticia-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .noticia-texto {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-sec);
+    }
+
+    .noticia-fecha {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .btn-del {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      margin-top: 1px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      line-height: 1;
+      transition: all .15s;
+    }
+
+    .btn-del:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(255, 61, 90, .1);
+    }
+
+    /* Stats */
+    .card-stats {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .stat-cat {
+      font-family: 'Oswald', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 10px 16px 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-cat::before {
+      content: '';
+      width: 18px;
+      height: 2px;
+      border-radius: 1px;
+    }
+
+    .cat-gol::before {
+      background: var(--accent3);
+    }
+
+    .cat-asi::before {
+      background: var(--accent);
+    }
+
+    .cat-val::before {
+      background: var(--gold);
+    }
+
+    .stat-row {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background .12s;
+    }
+
+    .stat-row:hover {
+      background: var(--bg-hover);
+    }
+
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--bg-hover), var(--border));
+      border: 1px solid var(--border-lit);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-sec);
+      flex-shrink: 0;
+    }
+
+    .stat-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .stat-nombre {
+      font-family: 'Oswald', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-pri);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stat-pos {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 1px;
+    }
+
+    .stat-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .stat-num {
+      font-family: 'Oswald', sans-serif;
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .num-gol {
+      color: var(--accent3);
+    }
+
+    .num-asi {
+      color: var(--accent);
+    }
+
+    .num-val {
+      color: var(--gold);
+    }
+
+    .stat-lbl {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .no-data {
+      padding: 18px 16px;
+      font-size: 13px;
+      color: var(--text-dim);
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* Footer */
+    footer {
+      flex-shrink: 0;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      padding: 7px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--accent), #0095c8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .footer-ver {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .footer-copy {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-deep);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    .btn-reset {
+      font-family: 'Oswald', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 3px;
+      transition: all .18s;
+    }
+    .btn-reset:hover {
+      color: var(--red);
+      border-color: var(--red);
+      background: rgba(255,61,90,.08);
+    }
+    /* ── Bloqueo móvil ── */
+  .mobile-block {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #080c12;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 32px;
+    text-align: center;
+  }
+  .mobile-block-icon { font-size: 48px; }
+  .mobile-block h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #00d4ff;
+  }
+  .mobile-block p {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 14px;
+    color: #8ab0cc;
+    line-height: 1.7;
+    max-width: 300px;
+  }
+  @media (max-width: 1024px) {
+    .mobile-block { display: flex; }
+  }
+  </style>
+</head>
+
+<body>
+<div class="mobile-block">
+  <div class="mobile-block-icon">🖥️</div>
+  <h2>Escritorio requerido</h2>
+  <p>Buitrago Manager está diseñado para pantallas grandes.<br>
+  Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
+</div>
+  <!-- ═══ TOP BAR -->
+  <header class="topbar">
+    <a href="{% url 'dashboard' %}" class="topbar-logo" style="text-decoration:none;">Buitrago Manager</a>
+
+    <div class="topbar-team">
+      <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
+      <div>
+        <div class="team-name">{{ equipo.nombre }}</div>
+        <div class="team-league">{{ liga.nombre }}</div>
+      </div>
+    </div>
+
+    <div class="topbar-stat">
+      <span class="lbl">M&aacute;nager</span>
+      <span class="val">{{ manager.nombre }}</span>
+    </div>
+    <div class="topbar-stat">
+      <span class="lbl">Jornada</span>
+      <span class="val">{% if liga.jornada_actual > liga.jornadas_totales %}{{ liga.jornadas_totales }}{% else %}{{ liga.jornada_actual }}{% endif %} / {{ liga.jornadas_totales }}</span>
+    </div>
+    <div class="topbar-stat">
+      <span class="lbl">Fecha</span>
+      <span class="val val-accent">{{ fecha_juego|date:"D d M Y" }}</span>
+    </div>
+
+    <div class="topbar-spacer"></div>
+
+    <nav class="topbar-nav">
+      <a href="{% url 'plantilla' %}" class="nav-btn">Plantilla</a>
+      <a href="{% url 'mercado_fichajes' %}" class="nav-btn">Fichajes</a>
+      <a href="{% url 'clasificacion' %}" class="nav-btn">Clasificaci&oacute;n</a>
+      <a href="{% url 'resultados' %}" class="nav-btn">Resultados</a>
+      <a href="{% url 'estadisticas' %}" class="nav-btn">Estad&iacute;sticas</a>
+      <a href="{% url 'historico' %}" class="nav-btn">Hist&oacute;rico</a>
+    </nav>
+
+    {% if proximo_partido %}
+    <a href="{% url 'seguir' %}" class="btn-accion btn-simular" title="Atajo: S">&#9654; Simular <span style="font-size:10px; opacity:.6; letter-spacing:1px;">[S]</span></a>
+    {% else %}
+    <a href="{% url 'seguir' %}" class="btn-accion btn-continuar" title="Atajo: C">&#9654; Continuar <span style="font-size:10px; opacity:.6; letter-spacing:1px;">[C]</span></a>
+    {% endif %}
+  </header>
+
+
+  <!-- ═══ MAIN -->
+  <main class="main">
+
+    <!-- PARTIDOS -->
+    <section class="partidos-row">
+
+      <!-- ÚLTIMO PARTIDO -->
+      <div class="card ultimo">
+        <div class="card-header">
+          <span class="tag tag-ultimo">&#10003; &Uacute;ltimo Partido</span>
+          <div class="card-meta">
+            <span class="meta-comp">{{ liga.nombre }}</span>
+            {% if ultimo_partido %}
+            <span>&middot;</span>
+            <span>Jornada {{ ultimo_partido.jornada.numero }}</span>
+            <span>&middot;</span>
+            {% if ultimo_partido.equipo_local == equipo %}
+            <span>&#127968; Local</span>
+            {% else %}
+            <span>&#9992;&#65039; Visitante</span>
+            {% endif %}
+            {% endif %}
+          </div>
+        </div>
+
+        {% if ultimo_partido %}
+        {% with gl=ultimo_partido.goles_local gv=ultimo_partido.goles_visitante %}
+        <div class="partido-body">
+          <div class="equipo-col">
+            <img class="escudo-partido" src="{% static 'core/img/'|add:ultimo_partido.equipo_local.abreviatura|add:'.png' %}" alt="{{ ultimo_partido.equipo_local.abreviatura }}">
+            <span class="nombre-eq {% if ultimo_partido.equipo_local == equipo %}mio{% endif %}">
+              {{ ultimo_partido.equipo_local.nombre_corto }}
+            </span>
+          </div>
+
+          <div class="marcador-centro">
+            {% if ultimo_partido.equipo_local == equipo %}
+            {% if gl > gv %}
+            <div class="marcador-num win">{{ gl }} &ndash; {{ gv }}</div>
+            <div class="result-badge badge-win">VICTORIA</div>
+            {% elif gl == gv %}
+            <div class="marcador-num draw">{{ gl }} &ndash; {{ gv }}</div>
+            <div class="result-badge badge-draw">EMPATE</div>
+            {% else %}
+            <div class="marcador-num lose">{{ gl }} &ndash; {{ gv }}</div>
+            <div class="result-badge badge-lose">DERROTA</div>
+            {% endif %}
+            {% else %}
+            {% if gv > gl %}
+            <div class="marcador-num win">{{ gl }} &ndash; {{ gv }}</div>
+            <div class="result-badge badge-win">VICTORIA</div>
+            {% elif gv == gl %}
+            <div class="marcador-num draw">{{ gl }} &ndash; {{ gv }}</div>
+            <div class="result-badge badge-draw">EMPATE</div>
+            {% else %}
+            <div class="marcador-num lose">{{ gl }} &ndash; {{ gv }}</div>
+            <div class="result-badge badge-lose">DERROTA</div>
+            {% endif %}
+            {% endif %}
+          </div>
+
+          <div class="equipo-col">
+            <img class="escudo-partido" src="{% static 'core/img/'|add:ultimo_partido.equipo_visitante.abreviatura|add:'.png' %}" alt="{{ ultimo_partido.equipo_visitante.abreviatura }}">
+            <span class="nombre-eq {% if ultimo_partido.equipo_visitante == equipo %}mio{% endif %}">
+              {{ ultimo_partido.equipo_visitante.nombre_corto }}
+            </span>
+          </div>
+        </div>
+        <div class="partido-footer">
+          <span>&#127967; {{ ultimo_partido.estadio }}</span>
+          <span>&#128101; {{ ultimo_partido.asistencia }} esp.</span>
+          <span>J{{ ultimo_partido.jornada.numero }}</span>
+        </div>
+        {% endwith %}
+        {% else %}
+        <div class="no-data">A&uacute;n no se ha disputado ning&uacute;n partido</div>
+        {% endif %}
+      </div>
+
+      <!-- PRÓXIMO PARTIDO -->
+      <div class="card proximo">
+        <div class="card-header">
+          <span class="tag tag-proximo">&#9719; Pr&oacute;ximo Partido</span>
+          <div class="card-meta">
+            <span class="meta-comp">{{ liga.nombre }}</span>
+            {% if proximo_partido %}
+            <span>&middot;</span>
+            <span>Jornada {{ proximo_partido.jornada.numero }}</span>
+            <span>&middot;</span>
+            {% if proximo_partido.equipo_local == equipo %}
+            <span>&#127968; Local</span>
+            {% else %}
+            <span>&#9992;&#65039; Visitante</span>
+            {% endif %}
+            {% endif %}
+          </div>
+        </div>
+
+        {% if proximo_partido %}
+        <div class="partido-body">
+          <div class="equipo-col">
+            <img class="escudo-partido" src="{% static 'core/img/'|add:proximo_partido.equipo_local.abreviatura|add:'.png' %}" alt="{{ proximo_partido.equipo_local.abreviatura }}">
+            <span class="nombre-eq {% if proximo_partido.equipo_local == equipo %}mio{% endif %}">
+              {{ proximo_partido.equipo_local.nombre_corto }}
+            </span>
+          </div>
+          <div class="marcador-centro">
+            <div class="marcador-vs">VS</div>
+            <div class="proximo-jornada">Jornada {{ proximo_partido.jornada.numero }}</div>
+          </div>
+          <div class="equipo-col">
+            <img class="escudo-partido" src="{% static 'core/img/'|add:proximo_partido.equipo_visitante.abreviatura|add:'.png' %}" alt="{{ proximo_partido.equipo_visitante.abreviatura }}">
+            <span class="nombre-eq {% if proximo_partido.equipo_visitante == equipo %}mio{% endif %}">
+              {{ proximo_partido.equipo_visitante.nombre_corto }}
+            </span>
+          </div>
+        </div>
+        <div class="partido-footer">
+          <span>&#127967; {{ proximo_partido.estadio }}</span>
+          <span></span>
+          <span>J{{ proximo_partido.jornada.numero }}</span>
+        </div>
+        {% else %}
+        <div class="no-data">No hay m&aacute;s partidos en esta temporada</div>
+        {% endif %}
+      </div>
+
+    </section>
+
+    <!-- BOTTOM ROW -->
+    <section class="bottom-row">
+
+      <!-- CLASIFICACIÓN -->
+      <div class="card card-clas">
+        <div class="section-title"><a href="{% url 'clasificacion' %}" class="ic" style="text-decoration:none; cursor:pointer;" title="Ver clasificación">&#9776;</a> Clasificaci&oacute;n</div>
+        <table class="clas-table">
+          <thead>
+            <tr>
+              <th style="width:30px">#</th>
+              <th style="width:22px"></th>
+              <th>Equipo</th>
+              <th>Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in clasificacion %}
+            {% if c.pos == 18 %}
+            <tr class="sep-row">
+              <td colspan="4">
+                <div class="sep-rel"></div>
+              </td>
+            </tr>
+            {% endif %}
+            <tr {% if c.equipo == equipo %}class="mi-fila" {% endif %}>
+              <td>
+                <span class="pos-num
+                  {% if c.pos == 1 %}p1
+                  {% elif c.pos == 2 %}p2
+                  {% elif c.pos >= 18 %}prel
+                  {% endif %}">{{ c.pos }}</span>
+              </td>
+              <td>
+                <img class="escudo-xs" src="{% static 'core/img/'|add:c.equipo.abreviatura|add:'.png' %}" alt="{{ c.equipo.abreviatura }}">
+              </td>
+              <td><span class="nombre-club">{{ c.equipo.nombre_corto }}</span></td>
+              <td class="pts">{{ c.puntos }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SALA DE PRENSA -->
+      <div class="card card-news">
+        <div class="section-title"><span class="ic">&#128240;</span> Sala de Prensa</div>
+        <div class="news-scroll" id="newsScroll">
+          {% for noticia in noticias %}
+          <div class="noticia" id="noticia-{{ noticia.id }}">
+            <div class="noticia-body">
+              <div class="noticia-texto">{{ noticia.texto }}</div>
+              <div class="noticia-fecha">Jornada {{ noticia.jornada }}</div>
+            </div>
+            <button class="btn-del" data-id="{{ noticia.id }}" title="Eliminar">
+              &#10005;
+            </button>
+          </div>
+          {% empty %}
+          <div class="no-data">No hay noticias a&uacute;n. &iexcl;Dale a Simular para empezar!</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- ESTADÍSTICAS MI EQUIPO -->
+      <div class="card card-stats">
+        <div class="section-title"><a href="{% url 'estadisticas' %}" class="ic" style="text-decoration:none; cursor:pointer;" title="Ver estadísticas">&#128202;</a> Mis Estad&iacute;sticas</div>
+
+        <div class="stat-cat cat-gol">Máximo Goleador</div>
+        {% if max_goleador %}
+        <div class="stat-row">
+          <div class="avatar">
+            {{ max_goleador.jugador__nombre|slice:":1" }}{{ max_goleador.jugador__apellidos|slice:":1" }}
+          </div>
+          <div class="stat-info">
+            <div class="stat-nombre">{{ max_goleador.jugador__nombre }} {{ max_goleador.jugador__apellidos }}</div>
+            <div class="stat-pos">{{ max_goleador.jugador__posicion }}</div>
+          </div>
+          <div class="stat-badge">
+            <span class="stat-num num-gol">{{ max_goleador.total }}</span>
+            <span class="stat-lbl">Goles</span>
+          </div>
+        </div>
+        {% else %}
+        <div class="no-data">Sin datos a&uacute;n</div>
+        {% endif %}
+
+        <div class="stat-cat cat-asi">M&aacute;ximo Asistente</div>
+        {% if max_asistente %}
+        <div class="stat-row">
+          <div class="avatar">
+            {{ max_asistente.jugador__nombre|slice:":1" }}{{ max_asistente.jugador__apellidos|slice:":1" }}
+          </div>
+          <div class="stat-info">
+            <div class="stat-nombre">{{ max_asistente.jugador__nombre }} {{ max_asistente.jugador__apellidos }}</div>
+            <div class="stat-pos">{{ max_asistente.jugador__posicion }}</div>
+          </div>
+          <div class="stat-badge">
+            <span class="stat-num num-asi">{{ max_asistente.total }}</span>
+            <span class="stat-lbl">Asist.</span>
+          </div>
+        </div>
+        {% else %}
+        <div class="no-data">Sin datos a&uacute;n</div>
+        {% endif %}
+
+        <div class="stat-cat cat-val">Mejor Valoraci&oacute;n</div>
+        {% if mejor_valoracion %}
+        <div class="stat-row">
+          <div class="avatar">
+            {{ mejor_valoracion.jugador__nombre|slice:":1" }}{{ mejor_valoracion.jugador__apellidos|slice:":1" }}
+          </div>
+          <div class="stat-info">
+            <div class="stat-nombre">{{ mejor_valoracion.jugador__nombre }} {{ mejor_valoracion.jugador__apellidos }}
+            </div>
+            <div class="stat-pos">{{ mejor_valoracion.jugador__posicion }}</div>
+          </div>
+          <div class="stat-badge">
+            <span class="stat-num num-val">{{ mejor_valoracion.media|floatformat:1 }}</span>
+            <span class="stat-lbl">Media</span>
+          </div>
+        </div>
+        {% else %}
+        <div class="no-data">Sin datos a&uacute;n</div>
+        {% endif %}
+
+      </div>
+
+    </section>
+  </main>
+
+
+  <!-- ═══ FOOTER -->
+  <footer>
+    <div class="footer-name">Buitrago Manager</div>
+    <div class="footer-ver">{{ liga.nombre }} {{ liga.temporada }} &middot; Jornada {% if liga.jornada_actual > liga.jornadas_totales %}{{ liga.jornadas_totales }}{% else %}{{ liga.jornada_actual }}{% endif %}</div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="footer-copy">Versi&oacute;n 0.1.0 Alpha</div>
+      <a href="{% url 'reset_juego' %}" class="btn-reset"
+        onclick="return confirm('¿Seguro? Se borrarán todos los datos y empezarás desde cero.')">
+        &#8635; Nueva Partida
+      </a>
+    </div>
+  </footer>
+
+
+  <script>
+    document.querySelectorAll('.btn-del').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = this.getAttribute('data-id');
+        borrarNoticia(id);
+      });
+    });
+
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(function (cookie) {
+          var c = cookie.trim();
+          if (c.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(c.substring(name.length + 1));
+          }
+        });
+      }
+      return cookieValue;
+    }
+
+    function borrarNoticia(id) {
+      var item = document.getElementById('noticia-' + id);
+      item.classList.add('removing');
+      fetch('/noticia/' + id + '/borrar/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCookie('csrftoken') }
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.ok) { setTimeout(function () { item.remove(); }, 260); }
+        });
+    }
+
+  // ── Atajos de teclado: S = Simular, C = Continuar ────────────
+  document.addEventListener('keydown', function(e) {
+    if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+    var key = e.key.toLowerCase();
+    if (key === 's') {
+      var btn = document.querySelector('.btn-simular');
+      if (btn) btn.click();
+    } else if (key === 'c') {
+      var btn = document.querySelector('.btn-continuar');
+      if (btn) btn.click();
+    }
+  });
+
+  </script>
+
+</body>
+
+</html>

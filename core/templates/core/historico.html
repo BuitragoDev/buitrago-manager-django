@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutMaster &mdash; Histórico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:   #080c12;
+    --bg-panel:  #0d1520;
+    --bg-card:   #111c2d;
+    --bg-hover:  #162234;
+    --border:    #1e304a;
+    --border-lit:#2a4668;
+    --accent:    #00d4ff;
+    --text-pri:  #eaf2fb;
+    --text-sec:  #8ab0cc;
+    --text-dim:  #3d5a75;
+    --green:     #00c875;
+    --red:       #ff3d5a;
+    --yellow:    #ffc337;
+    --gold:      #ffd700;
+    --silver:    #c0c0c0;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg-deep); color: var(--text-pri);
+    display: flex; flex-direction: column;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0,80,160,.18) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,74,.15) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,74,.08) 40px);
+  }
+
+  /* TOPBAR */
+  .topbar {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #090f1a 0%, #0e1b2a 100%);
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center;
+    height: 64px; padding: 0 24px;
+    box-shadow: 0 2px 24px rgba(0,0,0,.8); z-index: 100;
+  }
+  .topbar-logo {
+    font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    padding-right: 28px; border-right: 1px solid var(--border);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .topbar-team {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 28px; border-right: 1px solid var(--border); flex-shrink: 0;
+  }
+  .escudo-top { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+  .team-name   { font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 600; letter-spacing: 1px; color: var(--text-pri); line-height: 1.1; }
+  .team-league { font-size: 12px; color: var(--text-sec); text-transform: uppercase; letter-spacing: .8px; }
+  .topbar-stat { display: flex; flex-direction: column; padding: 0 28px; border-right: 1px solid var(--border); gap: 1px; flex-shrink: 0; }
+  .topbar-stat .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); }
+  .topbar-stat .val { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 500; color: var(--text-pri); letter-spacing: .5px; line-height: 1.1; }
+  .val-accent { color: var(--accent) !important; }
+  .topbar-spacer { flex: 1; }
+  .topbar-nav { display: flex; gap: 5px; flex-shrink: 0; }
+  .nav-btn {
+    padding: 7px 13px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-sec);
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 500;
+    letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; border-radius: 3px; transition: all .18s;
+    text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap;
+  }
+  .nav-btn:hover  { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.06); }
+  .nav-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.12); }
+
+  /* MAIN */
+  .main {
+    flex: 1; min-height: 0; overflow: hidden;
+    padding: 16px 28px 14px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .page-title { display: flex; align-items: baseline; gap: 14px; flex-shrink: 0; }
+  .page-title h1 {
+    font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--text-pri);
+  }
+  .page-title .sub { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; }
+  .title-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-lit), transparent); margin-bottom: 3px; }
+
+  /* LAYOUT DOS COLUMNAS */
+  .historico-layout {
+    flex: 1; min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 14px;
+  }
+
+  /* TABLA */
+  .tabla-wrap {
+    min-height: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* Temporada | Campeón | Subcampeón | Máx. Goleador | Goles | Mejor Jugador | Val. */
+  .t-grid {
+    display: grid;
+    grid-template-columns: 88px 1fr 1fr 1fr 56px 1fr 58px;
+    align-items: center;
+    padding: 0 16px;
+  }
+
+  .t-head {
+    flex-shrink: 0; height: 32px;
+    background: rgba(255,255,255,.022);
+    border-bottom: 2px solid var(--border);
+  }
+  .th {
+    font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 600;
+    letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .th.center { text-align: center; }
+  .sep { border-left: 1px solid var(--border); padding-left: 14px; }
+
+  .t-body { flex: 1; min-height: 0; overflow-y: auto; }
+  .t-body::-webkit-scrollbar { width: 5px; }
+  .t-body::-webkit-scrollbar-track { background: var(--bg-card); }
+  .t-body::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 3px; }
+
+  .t-row {
+    height: 42px;
+    border-bottom: 1px solid rgba(30,48,74,.3);
+    transition: background .1s;
+  }
+  .t-row:last-child { border-bottom: none; }
+  .t-row:hover { background: var(--bg-hover); }
+  .t-row.mi-campeon { background: rgba(0,212,255,.05); border-left: 3px solid var(--accent); }
+
+  .temp-cell {
+    font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 1px; color: var(--text-sec);
+  }
+
+  .equipo-cell { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .escudo-sm { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+  .equipo-nombre {
+    font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600;
+    letter-spacing: .3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .equipo-nombre.gold   { color: var(--gold); }
+  .equipo-nombre.silver { color: var(--silver); }
+
+  .jugador-cell { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .jugador-nombre {
+    font-size: 13px; font-weight: 600; color: var(--text-pri);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .jugador-equipo { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
+
+  .stat-num {
+    font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700;
+    text-align: center;
+  }
+  .stat-goles { color: var(--yellow); }
+  .stat-val   { color: var(--accent); }
+  .stat-dash  { color: var(--text-dim); }
+
+  /* PANEL LATERAL */
+  .panel-wrap {
+    display: flex; flex-direction: column; gap: 10px;
+    min-height: 0; overflow-y: auto;
+  }
+  .panel-wrap::-webkit-scrollbar { width: 4px; }
+  .panel-wrap::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 2px; }
+
+  .panel-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .panel-card.mi-card  { border-color: var(--accent); }
+  .panel-card.top-card { border-color: var(--gold); }
+
+  .panel-header {
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,.022);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .panel-escudo { width: 28px; height: 28px; object-fit: contain; flex-shrink: 0; }
+  .panel-title-wrap { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .panel-title {
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: .5px; color: var(--text-pri);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .panel-subtitle { font-size: 9px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; }
+  .panel-subtitle.accent { color: var(--accent); }
+  .panel-subtitle.gold   { color: var(--gold); }
+
+  .panel-stats { padding: 10px 14px 12px; display: flex; flex-direction: column; gap: 6px; }
+  .pstat {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .pstat-label { font-size: 11px; color: var(--text-dim); }
+  .pstat-val {
+    font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700;
+    line-height: 1;
+  }
+  .pstat-val.accent { color: var(--accent); }
+  .pstat-val.gold   { color: var(--gold); }
+  .pstat-val.yellow { color: var(--yellow); }
+  .pstat-val.green  { color: var(--green); }
+
+  .panel-divider { height: 1px; background: var(--border); margin: 2px 0; }
+
+  .panel-empty {
+    padding: 20px 14px; text-align: center;
+    font-size: 11px; color: var(--text-dim); letter-spacing: 1px;
+  }
+
+  .sin-datos {
+    text-align: center; padding: 80px 20px;
+    color: var(--text-dim);
+    font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 2px;
+  }
+  .sin-datos .icon { font-size: 48px; margin-bottom: 16px; opacity: .3; display: block; }
+  .sin-datos .sub  { font-size: 12px; font-weight: 400; margin-top: 6px; display: block; }
+
+  /* FOOTER */
+  footer {
+    flex-shrink: 0; background: var(--bg-panel); border-top: 1px solid var(--border);
+    padding: 7px 24px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-name {
+    font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .footer-ver { font-size: 12px; color: var(--text-dim); }
+  .btn-reset {
+    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-dim); text-decoration: none;
+    border: 1px solid var(--border); padding: 4px 10px; border-radius: 3px; transition: all .18s;
+  }
+  .btn-reset:hover { color: var(--red); border-color: var(--red); background: rgba(255,61,90,.08); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-logo">&#9917; FutMaster</div>
+  <div class="topbar-team">
+    <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
+    <div>
+      <div class="team-name">{{ equipo.nombre }}</div>
+      <div class="team-league">{{ liga.nombre }}</div>
+    </div>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">M&aacute;nager</span>
+    <span class="val">{{ manager.nombre }}</span>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">Temporada</span>
+    <span class="val">{{ liga.temporada }}</span>
+  </div>
+  <div class="topbar-stat">
+    <span class="lbl">Jornada</span>
+    <span class="val val-accent">{{ liga.jornada_actual }} / {{ liga.jornadas_totales }}</span>
+  </div>
+  <div class="topbar-spacer"></div>
+  <nav class="topbar-nav">
+    <a href="{% url 'dashboard' %}"        class="nav-btn">Inicio</a>
+    <a href="{% url 'plantilla' %}"        class="nav-btn">Plantilla</a>
+    <a href="{% url 'mercado_fichajes' %}" class="nav-btn">Fichajes</a>
+    <a href="{% url 'clasificacion' %}"    class="nav-btn">Clasificaci&oacute;n</a>
+    <a href="{% url 'resultados' %}"       class="nav-btn">Resultados</a>
+    <a href="{% url 'estadisticas' %}"     class="nav-btn">Estad&iacute;sticas</a>
+    <a href="{% url 'historico' %}"        class="nav-btn active">Hist&oacute;rico</a>
+  </nav>
+</header>
+
+<main class="main">
+  <div class="page-title">
+    <h1>Hist&oacute;rico</h1>
+    <span class="sub">{{ liga.nombre }} &middot; Palm&aacute;res por temporadas</span>
+    <div class="title-line"></div>
+  </div>
+
+  <div class="historico-layout">
+
+    <div class="tabla-wrap">
+    <div class="t-grid t-head">
+      <div class="th">Temporada</div>
+      <div class="th sep">&#127942; Campe&oacute;n</div>
+      <div class="th sep">&#129352; Subcampe&oacute;n</div>
+      <div class="th sep">&#9917; M&aacute;x. Goleador</div>
+      <div class="th center">Goles</div>
+      <div class="th sep">&#11088; Mejor Jugador</div>
+      <div class="th center">Val.</div>
+    </div>
+
+    <div class="t-body">
+      {% if registros %}
+        {% for r in registros %}
+        <div class="t-grid t-row {% if r.campeon == equipo or r.campeon.nombre == equipo.nombre %}mi-campeon{% endif %}">
+
+          <div class="temp-cell">{{ r.temporada }}</div>
+
+          <div class="equipo-cell sep">
+            {% if r.campeon %}
+              <img class="escudo-sm" src="{% static 'core/img/'|add:r.campeon.abreviatura|add:'.png' %}" alt="{{ r.campeon.abreviatura }}">
+              <span class="equipo-nombre gold">{{ r.campeon.nombre_corto }}</span>
+            {% else %}<span style="color:var(--text-dim)">—</span>{% endif %}
+          </div>
+
+          <div class="equipo-cell sep">
+            {% if r.subcampeon %}
+              <img class="escudo-sm" src="{% static 'core/img/'|add:r.subcampeon.abreviatura|add:'.png' %}" alt="{{ r.subcampeon.abreviatura }}">
+              <span class="equipo-nombre silver">{{ r.subcampeon.nombre_corto }}</span>
+            {% else %}<span style="color:var(--text-dim)">—</span>{% endif %}
+          </div>
+
+          <div class="jugador-cell sep">
+            {% if r.max_goleador %}
+              <span class="jugador-nombre">{% if r.max_goleador.nombre %}{{ r.max_goleador.nombre }} {{ r.max_goleador.apellidos }}{% else %}{{ r.max_goleador.jugador__nombre }} {{ r.max_goleador.jugador__apellidos }}{% endif %}</span>
+              <span class="jugador-equipo">{% if r.max_goleador.equipo %}{{ r.max_goleador.equipo.nombre_corto }}{% else %}{{ r.max_goleador.jugador__equipo__nombre_corto }}{% endif %}</span>
+            {% else %}<span style="color:var(--text-dim)">—</span>{% endif %}
+          </div>
+
+          <div class="stat-num {% if r.max_goleador %}stat-goles{% else %}stat-dash{% endif %}">
+            {% if r.max_goleador %}{% if r.goles_max_goleador %}{{ r.goles_max_goleador }}{% else %}{{ r.max_goleador.total }}{% endif %}{% else %}—{% endif %}
+          </div>
+
+          <div class="jugador-cell sep">
+            {% if r.mejor_jugador %}
+              <span class="jugador-nombre">{% if r.mejor_jugador.nombre %}{{ r.mejor_jugador.nombre }} {{ r.mejor_jugador.apellidos }}{% else %}{{ r.mejor_jugador.jugador__nombre }} {{ r.mejor_jugador.jugador__apellidos }}{% endif %}</span>
+              <span class="jugador-equipo">{% if r.mejor_jugador.equipo %}{{ r.mejor_jugador.equipo.nombre_corto }}{% else %}{{ r.mejor_jugador.jugador__equipo__nombre_corto }}{% endif %}</span>
+            {% else %}<span style="color:var(--text-dim)">—</span>{% endif %}
+          </div>
+
+          <div class="stat-num {% if r.mejor_jugador %}stat-val{% else %}stat-dash{% endif %}">
+            {% if r.mejor_jugador %}{% if r.valoracion_mejor_jugador %}{{ r.valoracion_mejor_jugador }}{% else %}{{ r.mejor_jugador.media|floatformat:1 }}{% endif %}{% else %}—{% endif %}
+          </div>
+
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="sin-datos">
+          <span class="icon">&#128218;</span>
+          A&uacute;n no hay temporadas finalizadas
+          <span class="sub">El hist&oacute;rico se rellenar&aacute; al terminar la primera temporada</span>
+        </div>
+      {% endif %}
+    </div><!-- /t-body -->
+  </div><!-- /tabla-wrap -->
+
+    <!-- ══ PANEL LATERAL ══ -->
+    <div class="panel-wrap">
+
+      {% if total_temporadas == 0 %}
+        <div class="panel-card">
+          <div class="panel-empty">Sin temporadas finalizadas todavía</div>
+        </div>
+      {% else %}
+
+      <!-- Mi equipo -->
+      <div class="panel-card mi-card">
+        <div class="panel-header">
+          <img class="panel-escudo" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
+          <div class="panel-title-wrap">
+            <div class="panel-title">{{ equipo.nombre_corto }}</div>
+            <div class="panel-subtitle accent">Mi equipo</div>
+          </div>
+        </div>
+        <div class="panel-stats">
+          <div class="pstat">
+            <span class="pstat-label">Temporadas jugadas</span>
+            <span class="pstat-val accent">{{ total_temporadas }}</span>
+          </div>
+          <div class="panel-divider"></div>
+          <div class="pstat">
+            <span class="pstat-label">&#127942; Campeonatos</span>
+            <span class="pstat-val gold">{{ mi_campeonatos }}</span>
+          </div>
+          <div class="pstat">
+            <span class="pstat-label">&#9917; M&aacute;x. Goleador</span>
+            <span class="pstat-val yellow">{{ mi_goleadores }}</span>
+          </div>
+          <div class="pstat">
+            <span class="pstat-label">&#11088; Mejor Jugador</span>
+            <span class="pstat-val green">{{ mi_mejores }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mejor equipo histórico -->
+      {% if mejor_equipo %}
+      <div class="panel-card top-card">
+        <div class="panel-header">
+          <img class="panel-escudo" src="{% static 'core/img/'|add:mejor_equipo.abreviatura|add:'.png' %}" alt="{{ mejor_equipo.abreviatura }}">
+          <div class="panel-title-wrap">
+            <div class="panel-title">{{ mejor_equipo.nombre_corto }}</div>
+            <div class="panel-subtitle gold">Mejor hist&oacute;rico</div>
+          </div>
+        </div>
+        <div class="panel-stats">
+          <div class="pstat">
+            <span class="pstat-label">Temporadas totales</span>
+            <span class="pstat-val accent">{{ total_temporadas }}</span>
+          </div>
+          <div class="panel-divider"></div>
+          <div class="pstat">
+            <span class="pstat-label">&#127942; Campeonatos</span>
+            <span class="pstat-val gold">{{ mejor_equipo_camps }}</span>
+          </div>
+          <div class="pstat">
+            <span class="pstat-label">&#9917; M&aacute;x. Goleador</span>
+            <span class="pstat-val yellow">{{ mejor_equipo_gol }}</span>
+          </div>
+          <div class="pstat">
+            <span class="pstat-label">&#11088; Mejor Jugador</span>
+            <span class="pstat-val green">{{ mejor_equipo_mejor }}</span>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% endif %}
+    </div><!-- /panel-wrap -->
+
+  </div><!-- /historico-layout -->
+</main>
+
+<footer>
+  <div class="footer-name">&#9917; FutMaster</div>
+  <div class="footer-ver">{{ liga.nombre }} {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual }}</div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <div class="footer-ver">Versi&oacute;n 0.1.0 Alpha</div>
+    <a href="{% url 'reset_juego' %}" class="btn-reset"
+       onclick="return confirm('Seguro? Se borraran todos los datos y empezaras desde cero.')">
+      &#8635; Nueva Partida
+    </a>
+  </div>
+</footer>
+
+<script>
+
+</script>
+</body>
+</html>

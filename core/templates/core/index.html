@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutMaster — Nueva Temporada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:    #080c12;
+    --bg-panel:   #0d1520;
+    --bg-card:    #111c2d;
+    --bg-hover:   #162234;
+    --border:     #1e304a;
+    --border-lit: #2a4668;
+    --accent:     #00d4ff;
+    --accent2:    #ff6b35;
+    --gold:       #ffc337;
+    --text-pri:   #eaf2fb;
+    --text-sec:   #8ab0cc;
+    --text-dim:   #3d5a75;
+    --green:      #00c875;
+    --red:        #ff3d5a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-pri);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-image:
+      radial-gradient(ellipse 100% 60% at 50% 0%, rgba(0,80,160,.22) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 40% at 50% 100%, rgba(0,60,120,.15) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,74,.12) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,74,.07) 40px);
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 1300px;
+    padding: 0 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+
+  /* TÍTULO */
+  .game-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .game-logo {
+    font-family: 'Oswald', sans-serif;
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, #ffffff 0%, var(--accent) 60%, #0070a0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+    filter: drop-shadow(0 0 30px rgba(0,212,255,.35));
+  }
+  .game-subtitle {
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .game-divider {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin-top: 4px;
+  }
+
+  /* ERROR */
+  .error-msg {
+    background: rgba(255,61,90,.12);
+    border: 1px solid rgba(255,61,90,.3);
+    color: var(--red);
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 8px 20px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  /* INPUT NOMBRE */
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .input-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .input-nombre {
+    width: 340px;
+    padding: 12px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-pri);
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-align: center;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .input-nombre::placeholder {
+    color: var(--text-dim);
+    font-size: 15px;
+    letter-spacing: 2px;
+  }
+  .input-nombre:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,212,255,.12), 0 0 20px rgba(0,212,255,.08);
+  }
+
+  /* GRID EQUIPOS */
+  .equipos-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .equipos-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .equipos-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+  .equipo-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 8px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+  }
+  .equipo-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: transparent;
+    transition: background .2s;
+  }
+  .equipo-card:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-lit);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.4);
+  }
+  .equipo-card:hover::before {
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+  .equipo-card.selected {
+    background: rgba(0,212,255,.08);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 6px 24px rgba(0,212,255,.2);
+    transform: translateY(-2px);
+  }
+  .equipo-card.selected::before {
+    background: linear-gradient(90deg, var(--accent), rgba(0,212,255,.3));
+  }
+
+  /* Escudo con color dinámico aplicado por JS */
+  .escudo-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.6));
+    transition: transform .2s;
+    flex-shrink: 0;
+  }
+  .equipo-card:hover .escudo-badge,
+  .equipo-card.selected .escudo-badge {
+    transform: scale(1.08);
+  }
+
+  .equipo-nombre {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .5px;
+    color: var(--text-sec);
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 1.2;
+    transition: color .2s;
+  }
+  .equipo-card:hover .equipo-nombre { color: var(--text-pri); }
+  .equipo-card.selected .equipo-nombre { color: var(--accent); font-weight: 600; }
+
+  .check-icon {
+    position: absolute;
+    top: 6px; right: 7px;
+    font-size: 12px;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .equipo-card.selected .check-icon { opacity: 1; }
+
+  /* BOTÓN COMENZAR */
+  .btn-comenzar {
+    padding: 13px 52px;
+    background: linear-gradient(135deg, var(--accent2) 0%, #d03c14 100%);
+    border: none;
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 5px;
+    box-shadow: 0 4px 24px rgba(255,107,53,.35);
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+    opacity: .4;
+    pointer-events: none;
+  }
+  .btn-comenzar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.18) 0%, transparent 55%);
+  }
+  .btn-comenzar.ready { opacity: 1; pointer-events: all; }
+  .btn-comenzar.ready:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255,107,53,.55);
+  }
+  .btn-comenzar.ready:active { transform: translateY(0); }
+
+  .seleccion-info {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: .5px;
+    text-align: center;
+    height: 18px;
+    transition: color .2s;
+  }
+  .seleccion-info.ok { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- TÍTULO -->
+  <div class="game-header">
+    <div class="game-logo"><img src="{% static 'core/img/logo.png' %}" alt="logo" style="height:100px; width:auto; vertical-align:middle; margin-right:16px; filter:drop-shadow(0 0 20px rgba(0,212,255,.4));">
+      BUITRAGO MANAGER
+    </div>
+    <div class="game-subtitle">Premier League &middot; Temporada 2025 &ndash; 26</div>
+    <div class="game-divider"></div>
+  </div>
+
+  <!-- FORMULARIO -->
+  <form method="post" action="{% url 'index' %}" id="formInicio">
+    {% csrf_token %}
+    <input type="hidden" name="equipo_id" id="equipoIdInput" value="">
+
+    {% if error %}
+    <div class="error-msg">&#9888; {{ error }}</div>
+    {% endif %}
+
+    <!-- NOMBRE -->
+    <div class="input-section">
+      <div class="input-label">Nombre del M&aacute;nager</div>
+      <input
+        class="input-nombre"
+        id="inputNombre"
+        type="text"
+        name="nombre"
+        maxlength="20"
+        placeholder="Introduce tu nombre"
+        oninput="actualizarEstado()"
+        autocomplete="off"
+        value="{% if nombre_previo %}{{ nombre_previo }}{% endif %}"
+      />
+    </div>
+
+    <!-- EQUIPOS -->
+    <div class="equipos-section" style="margin-top:16px">
+      <div class="equipos-label">Elige tu equipo</div>
+      <div class="equipos-grid" id="equiposGrid">
+        {% for equipo in equipos %}
+        <div
+          class="equipo-card"
+          onclick="seleccionar(this, '{{ equipo.id }}', '{{ equipo.nombre_corto }}')"
+          data-id="{{ equipo.id }}"
+        >
+          <span class="check-icon">&#10004;</span>
+          <img class="escudo-badge" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
+          <span class="equipo-nombre">{{ equipo.nombre_corto }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </form>
+
+  <!-- ESTADO Y BOTÓN -->
+  <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+    <div class="seleccion-info" id="seleccionInfo">
+      Introduce tu nombre y elige un equipo para comenzar
+    </div>
+    <button class="btn-comenzar" id="btnComenzar" onclick="submitForm()">
+      &#9658; Comenzar Temporada
+    </button>
+  </div>
+
+</div>
+
+<script>
+  var equipoSeleccionado = null;
+  var equipoNombre = '';
+
+  function seleccionar(card, id, nombre) {
+    document.querySelectorAll('.equipo-card').forEach(function(c) {
+      c.classList.remove('selected');
+    });
+    card.classList.add('selected');
+    equipoSeleccionado = id;
+    equipoNombre = nombre;
+    document.getElementById('equipoIdInput').value = id;
+    actualizarEstado();
+  }
+
+  function actualizarEstado() {
+    var nombre = document.getElementById('inputNombre').value.trim();
+    var info   = document.getElementById('seleccionInfo');
+    var btn    = document.getElementById('btnComenzar');
+
+    if (nombre && equipoSeleccionado) {
+      info.textContent = 'Manager: ' + nombre + '  \u00b7  Equipo: ' + equipoNombre;
+      info.classList.add('ok');
+      btn.classList.add('ready');
+    } else if (nombre && !equipoSeleccionado) {
+      info.textContent = 'Ahora elige tu equipo';
+      info.classList.remove('ok');
+      btn.classList.remove('ready');
+    } else if (!nombre && equipoSeleccionado) {
+      info.textContent = 'Introduce tu nombre de manager';
+      info.classList.remove('ok');
+      btn.classList.remove('ready');
+    } else {
+      info.textContent = 'Introduce tu nombre y elige un equipo para comenzar';
+      info.classList.remove('ok');
+      btn.classList.remove('ready');
+    }
+  }
+
+  function submitForm() {
+    if (!equipoSeleccionado) return;
+    document.getElementById('formInicio').submit();
+  }
+</script>
+
+</body>
+</html>
