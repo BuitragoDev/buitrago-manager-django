@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Buitrago Manager &mdash; Plantilla</title>
+<title>Tactical Eleven &mdash; Plantilla</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -113,7 +113,7 @@
   */
   .t-grid {
     display: grid;
-    grid-template-columns: 38px 360px 58px 90px 52px 52px 52px 52px 52px 52px 52px 52px 52px 64px 58px 52px 52px 80px 200px;
+    grid-template-columns: 38px 360px 58px 90px 52px 52px 52px 52px 52px 52px 52px 52px 52px 64px 58px 52px 52px 58px 80px 200px;
     align-items: center;
     padding: 0 12px;
   }
@@ -190,6 +190,7 @@
   .s-val { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-align: center; color: var(--accent); }
   .s-ama { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-align: center; color: var(--yellow); }
   .s-roj { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-align: center; color: var(--red); }
+  .s-min { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-align: center; color: var(--green); }
   .s-cero { color: var(--text-dim) !important; font-weight: 400 !important; }
 
   /* Contrato */
@@ -240,12 +241,51 @@
     border: 1px solid var(--border); padding: 4px 10px; border-radius: 3px; transition: all .18s;
   }
   .btn-reset:hover { color: var(--red); border-color: var(--red); background: rgba(255,61,90,.08); }
+
+  /* ── Bloqueo móvil ── */
+  .mobile-block {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #080c12;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 32px;
+    text-align: center;
+  }
+  .mobile-block-icon { font-size: 48px; }
+  .mobile-block h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #00d4ff;
+  }
+  .mobile-block p {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 14px;
+    color: #8ab0cc;
+    line-height: 1.7;
+    max-width: 300px;
+  }
+  @media (max-width: 1024px) {
+    .mobile-block { display: flex; }
+  }
 </style>
 </head>
 <body>
-
+<div class="mobile-block">
+  <div class="mobile-block-icon">🖥️</div>
+  <h2>Escritorio requerido</h2>
+  <p>Tactical Eleven está diseñado para pantallas grandes.<br>
+  Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
+</div>
 <header class="topbar">
-  <div class="topbar-logo">Buitrago Manager</div>
+  <div class="topbar-logo">Tactical Eleven</div>
   <div class="topbar-team">
     <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
     <div>
@@ -306,19 +346,20 @@
       <div class="th">Val.</div>
       <div class="th">Ama.</div>
       <div class="th">Roj.</div>
+      <div class="th">Min.</div>
       <!-- Contrato y acción -->
       <div class="th sep">Contrato</div>
       <div class="th"></div>
     </div>
 
     <!-- CUERPO -->
-    <div class="t-body">{% for j in plantilla_dict.POR %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-por">POR</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}{% for j in plantilla_dict.DEF %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-def">DEF</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}{% for j in plantilla_dict.MED %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-med">MED</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}{% for j in plantilla_dict.DEL %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-del">DEL</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}</div>
+    <div class="t-body">{% for j in plantilla_dict.POR %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-por">POR</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="s-min">{{ j.stats_minutos }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}{% for j in plantilla_dict.DEF %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-def">DEF</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="s-min">{{ j.stats_minutos }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}{% for j in plantilla_dict.MED %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-med">MED</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="s-min">{{ j.stats_minutos }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}{% for j in plantilla_dict.DEL %}<div class="t-grid t-row" data-contrato="{{ j.temporadas_contrato }}" data-edad="{{ j.edad }}" data-renovar-url="{% url 'renovar_jugador' j.id %}" data-despedir-url="{% url 'despedir_jugador' j.id %}" data-nombre="{{ j.nombre }} {{ j.apellidos }}" data-lesionado="{{ j.lesionado }}"><div class="dorsal">{{ j.dorsal }}</div><div class="jugador-info"><span class="jugador-nombre">{{ j.nombre }} {{ j.apellidos }}</span><span class="jugador-edad">{{ j.edad }}a</span></div><div style="text-align:center"><span class="dem-badge badge-del">DEL</span></div><div class="estado-col"></div><div class="attr sep">{{ j.velocidad }}</div><div class="attr">{{ j.regate }}</div><div class="attr">{{ j.pase }}</div><div class="attr">{{ j.disparo }}</div><div class="attr">{{ j.defensa }}</div><div class="attr">{{ j.fisico }}</div><div class="attr">{{ j.porteria }}</div><div class="attr media-col">{{ j.valoracion_media }}</div><div class="s-gol sep">{{ j.stats_goles }}</div><div class="s-ast">{{ j.stats_asistencias }}</div><div class="s-val">{% if j.stats_valoracion %}{{ j.stats_valoracion|floatformat:2 }}{% else %}—{% endif %}</div><div class="s-ama">{{ j.stats_amarillas }}</div><div class="s-roj">{{ j.stats_rojas }}</div><div class="s-min">{{ j.stats_minutos }}</div><div class="contrato sep">{{ j.temporadas_contrato }}T</div><div class="accion-col"></div></div>{% endfor %}</div>
 
   </div>
 </main>
 
 <footer>
-  <div class="footer-name">Buitrago Manager</div>
+  <div class="footer-name">Tactical Eleven</div>
   <div class="footer-ver">{{ liga.nombre }} {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual }}</div>
   <div style="display:flex; align-items:center; gap:16px;">
     <div class="footer-ver">Versi&oacute;n 0.1.0 Alpha</div>

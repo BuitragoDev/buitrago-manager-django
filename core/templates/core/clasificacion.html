@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FutMaster &mdash; Clasificaci&oacute;n</title>
+<title>Tactical Eleven &mdash; Clasificaci&oacute;n</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -261,13 +261,51 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg-deep); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  /* ── Bloqueo móvil ── */
+  .mobile-block {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #080c12;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 32px;
+    text-align: center;
+  }
+  .mobile-block-icon { font-size: 48px; }
+  .mobile-block h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #00d4ff;
+  }
+  .mobile-block p {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 14px;
+    color: #8ab0cc;
+    line-height: 1.7;
+    max-width: 300px;
+  }
+  @media (max-width: 1024px) {
+    .mobile-block { display: flex; }
+  }
 </style>
 </head>
 <body>
-
+<div class="mobile-block">
+  <div class="mobile-block-icon">🖥️</div>
+  <h2>Escritorio requerido</h2>
+  <p>Tactical Eleven está diseñado para pantallas grandes.<br>
+  Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
+</div>
 <!-- TOP BAR -->
 <header class="topbar">
-  <div class="topbar-logo">&#9917; FutMaster</div>
+  <div class="topbar-logo">Tactical Eleven</div>
   <div class="topbar-team">
     <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
     <div>
@@ -467,7 +505,7 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-name">&#9917; FutMaster</div>
+  <div class="footer-name">Tactical Eleven</div>
   <div class="footer-ver">{{ liga.nombre }} {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual }}</div>
   <div style="display:flex; align-items:center; gap:16px;">
     <div class="footer-ver">Versi&oacute;n 0.1.0 Alpha</div>

@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buitrago Manager &mdash; {{ equipo.nombre_corto }}</title>
+  <title>Tactical Eleven &mdash; {{ equipo.nombre_corto }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap"
@@ -929,12 +929,12 @@
 <div class="mobile-block">
   <div class="mobile-block-icon">🖥️</div>
   <h2>Escritorio requerido</h2>
-  <p>Buitrago Manager está diseñado para pantallas grandes.<br>
+  <p>Tactical Eleven está diseñado para pantallas grandes.<br>
   Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
 </div>
   <!-- ═══ TOP BAR -->
   <header class="topbar">
-    <a href="{% url 'dashboard' %}" class="topbar-logo" style="text-decoration:none;">Buitrago Manager</a>
+    <a href="{% url 'dashboard' %}" class="topbar-logo" style="text-decoration:none;">Tactical Eleven</a>
 
     <div class="topbar-team">
       <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
@@ -1238,7 +1238,7 @@
 
   <!-- ═══ FOOTER -->
   <footer>
-    <div class="footer-name">Buitrago Manager</div>
+    <div class="footer-name">Tactical Eleven</div>
     <div class="footer-ver">{{ liga.nombre }} {{ liga.temporada }} &middot; Jornada {% if liga.jornada_actual > liga.jornadas_totales %}{{ liga.jornadas_totales }}{% else %}{{ liga.jornada_actual }}{% endif %}</div>
     <div style="display:flex; align-items:center; gap:16px;">
       <div class="footer-copy">Versi&oacute;n 0.1.0 Alpha</div>

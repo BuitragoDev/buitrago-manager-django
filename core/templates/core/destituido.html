@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FutMaster &mdash; Destituido</title>
+<title>Buitrago Manager &mdash; Destituido</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -161,10 +161,48 @@
     background: linear-gradient(90deg, var(--accent), #0095c8);
     -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   }
+  /* ── Bloqueo móvil ── */
+  .mobile-block {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #080c12;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 32px;
+    text-align: center;
+  }
+  .mobile-block-icon { font-size: 48px; }
+  .mobile-block h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #00d4ff;
+  }
+  .mobile-block p {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 14px;
+    color: #8ab0cc;
+    line-height: 1.7;
+    max-width: 300px;
+  }
+  @media (max-width: 1024px) {
+    .mobile-block { display: flex; }
+  }
 </style>
 </head>
 <body>
-
+<div class="mobile-block">
+  <div class="mobile-block-icon">🖥️</div>
+  <h2>Escritorio requerido</h2>
+  <p>Buitrago Manager está diseñado para pantallas grandes.<br>
+  Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
+</div>
 <div class="card">
   <div class="card-top">
     <div class="icon-wrapper">&#128683;</div>

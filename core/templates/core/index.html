@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FutMaster — Nueva Temporada</title>
+<title>Tactical Eleven — Nueva Temporada</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -288,17 +288,72 @@
     height: 18px;
     transition: color .2s;
   }
-  .seleccion-info.ok { color: var(--accent); }
+  .footer-disclaimer {
+    position: fixed;
+    bottom: 12px;
+    width: 100%;
+    text-align: center;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: .5px;
+  }
+  .footer-disclaimer a {
+    color: var(--text-dim);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color .2s;
+  }
+  .footer-disclaimer a:hover { color: var(--text-sec); }
+
+  /* ── Bloqueo móvil ── */
+  .mobile-block {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #080c12;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 32px;
+    text-align: center;
+  }
+  .mobile-block-icon { font-size: 48px; }
+  .mobile-block h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #00d4ff;
+  }
+  .mobile-block p {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 14px;
+    color: #8ab0cc;
+    line-height: 1.7;
+    max-width: 300px;
+  }
+  @media (max-width: 1024px) {
+    .mobile-block { display: flex; }
+  }
 </style>
 </head>
 <body>
-
+<div class="mobile-block">
+  <div class="mobile-block-icon">🖥️</div>
+  <h2>Escritorio requerido</h2>
+  <p>Tactical Eleven está diseñado para pantallas grandes.<br>
+  Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
+</div>
 <div class="wrapper">
 
   <!-- TÍTULO -->
   <div class="game-header">
     <div class="game-logo"><img src="{% static 'core/img/logo.png' %}" alt="logo" style="height:100px; width:auto; vertical-align:middle; margin-right:16px; filter:drop-shadow(0 0 20px rgba(0,212,255,.4));">
-      BUITRAGO MANAGER
+      TACTICAL ELEVEN
     </div>
     <div class="game-subtitle">Premier League &middot; Temporada 2025 &ndash; 26</div>
     <div class="game-divider"></div>
@@ -405,6 +460,11 @@
     document.getElementById('formInicio').submit();
   }
 </script>
+
+<div class="footer-disclaimer">
+  Tactical Eleven es un proyecto personal sin fines comerciales &middot;
+  <a href="/aviso-legal/" target="_blank">Aviso legal</a>
+</div>
 
 </body>
 </html>

@@ -131,6 +131,14 @@ class Command(BaseCommand):
     help = "Pobla la BD con Premier League + Division Inferior 2025/26"
 
     def handle(self, *args, **kwargs):
+        # ── Protección: no ejecutar si ya hay datos ──────────────
+        if Liga.objects.exists():
+            self.stdout.write(self.style.WARNING(
+                "La BD ya tiene datos. Saltando poblar_db. "
+                "Usa 'reset_juego' desde la web para empezar de cero."
+            ))
+            return
+
         self.stdout.write("\n" + "=" * 60)
         self.stdout.write("  FUTMASTER — Inicializando temporada 2025/26")
         self.stdout.write("=" * 60 + "\n")
