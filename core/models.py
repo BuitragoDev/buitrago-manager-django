@@ -11,6 +11,7 @@ class Liga(models.Model):
     temporada       = models.CharField(max_length=20)           # "2024-25"
     jornadas_totales = models.PositiveSmallIntegerField(default=38)
     jornada_actual  = models.PositiveSmallIntegerField(default=1)
+    nivel           = models.PositiveSmallIntegerField(default=1)  # 1=Premier, 2=Championship, 3=League One, 4=League Two
 
     def __str__(self):
         return f"{self.nombre} · {self.temporada}"

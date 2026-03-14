@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tactical Eleven &mdash; Resultados Jornada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:    #080c12;
+    --bg-panel:   #0d1520;
+    --bg-card:    #111c2d;
+    --bg-hover:   #162234;
+    --border:     #1e304a;
+    --border-lit: #2a4668;
+    --accent:     #00d4ff;
+    --accent2:    #ff6b35;
+    --gold:       #ffc337;
+    --text-pri:   #eaf2fb;
+    --text-sec:   #8ab0cc;
+    --text-dim:   #3d5a75;
+    --green:      #00c875;
+    --red:        #ff3d5a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-pri);
+    display: flex; flex-direction: column;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0,80,160,.18) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,74,.15) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,74,.08) 40px);
+  }
+
+  /* ══ TOP BAR MINIMALISTA ══ */
+  .topbar {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #090f1a 0%, #0e1b2a 100%);
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px; padding: 0 32px;
+    box-shadow: 0 2px 24px rgba(0,0,0,.8);
+    z-index: 100;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 20px; }
+  .topbar-logo {
+    font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+  }
+  .topbar-jornada {
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-dim); padding-left: 20px; border-left: 1px solid var(--border);
+  }
+  .topbar-jornada span { color: var(--accent); }
+  .btn-continuar {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: #fff; text-decoration: none;
+    background: linear-gradient(135deg, var(--accent2) 0%, #d03c14 100%);
+    padding: 10px 30px; border-radius: 5px;
+    box-shadow: 0 4px 20px rgba(255,107,53,.4);
+    transition: all .2s; position: relative; overflow: hidden;
+  }
+  .btn-continuar::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.15) 0%, transparent 55%);
+  }
+  .btn-continuar:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,107,53,.55); }
+  .btn-continuar:active { transform: translateY(0); }
+  .btn-continuar .atajo { font-size: 11px; opacity: .6; letter-spacing: 1px; }
+
+  /* ══ MAIN ══ */
+  .main {
+    flex: 1; overflow: hidden;
+    padding: 14px 28px 10px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+
+  /* ══ PAGE TITLE ══ */
+  .page-title { display: flex; align-items: baseline; gap: 14px; flex-shrink: 0; }
+  .page-title h1 {
+    font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--text-pri);
+  }
+  .page-title .sub { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; }
+  .title-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-lit), transparent); margin-bottom: 3px; }
+
+  /* ══ TABS ══ */
+  .liga-tabs { display: flex; gap: 10px; flex-shrink: 0; }
+  .liga-tab {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 8px 20px; min-width: 130px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer; transition: all .18s;
+  }
+  .liga-tab:hover { background: var(--bg-hover); border-color: var(--border-lit); }
+  .liga-tab.active {
+    background: rgba(0,212,255,.08); border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 4px 16px rgba(0,212,255,.12);
+  }
+  .liga-tab-logo {
+    height: 32px; width: auto; object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); transition: transform .18s;
+  }
+  .liga-tab:hover .liga-tab-logo,
+  .liga-tab.active .liga-tab-logo { transform: scale(1.08); }
+  .liga-tab-nombre {
+    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--text-sec); transition: color .18s;
+  }
+  .liga-tab.active .liga-tab-nombre { color: var(--accent); }
+  .liga-tab:hover .liga-tab-nombre { color: var(--text-pri); }
+
+  /* ══ PANELES DE LIGA ══ */
+  .liga-panel { display: none; flex: 1; min-height: 0; overflow-y: auto; }
+  .liga-panel.visible { display: block; }
+  .liga-panel::-webkit-scrollbar { width: 4px; }
+  .liga-panel::-webkit-scrollbar-track { background: transparent; }
+  .liga-panel::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 2px; }
+
+  /* ══ HEADER JORNADA ══ */
+  .jornada-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 10px 0 8px; margin-bottom: 4px;
+  }
+  .jornada-badge {
+    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent); background: rgba(0,212,255,.1);
+    border: 1px solid rgba(0,212,255,.3); padding: 4px 14px; border-radius: 20px;
+  }
+  .jornada-header-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-lit), transparent); }
+
+  /* ══ GRID PARTIDOS ══ */
+  .partidos-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding-bottom: 12px;
+  }
+
+  /* ══ TARJETA PARTIDO ══ */
+  .partido-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color .18s;
+  }
+  .partido-card:hover { border-color: var(--border-lit); }
+  .partido-card.mi-partido {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px rgba(0,212,255,.3), 0 4px 20px rgba(0,212,255,.12);
+  }
+
+  /* Cabecera con resultado */
+  .partido-header {
+    display: grid;
+    grid-template-columns: 1fr 110px 1fr;
+    align-items: center;
+    padding: 12px 16px 10px;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .partido-card.mi-partido .partido-header {
+    background: linear-gradient(135deg, rgba(0,212,255,.06) 0%, transparent 60%);
+  }
+
+  .equipo-lado {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .equipo-lado.visitante { justify-content: flex-end; }
+  .escudo-partido { width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; }
+  .equipo-card-nombre {
+    font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600;
+    letter-spacing: .3px; color: var(--text-pri); white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .equipo-card-nombre.ganador { color: var(--green); }
+
+  .marcador {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .gol {
+    font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700;
+    color: var(--text-pri); line-height: 1;
+  }
+  .gol.ganador { color: var(--gold); }
+  .sep-marcador {
+    font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 400;
+    color: var(--text-dim);
+  }
+  .mvp-val {
+    margin-left: auto; flex-shrink: 0;
+    font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; color: var(--gold);
+  }
+  .partido-body {
+    padding: 8px 16px 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 8px;
+    min-height: 44px;
+  }
+  .goleadores-col { display: flex; flex-direction: column; gap: 2px; }
+  .goleadores-col.visitante { align-items: flex-end; text-align: right; }
+
+  .gol-item {
+    font-size: 11px; color: var(--text-sec);
+    display: flex; align-items: center; gap: 5px; white-space: nowrap;
+  }
+  .goleadores-col.visitante .gol-item { flex-direction: row-reverse; }
+  .gol-icon { color: var(--gold); font-size: 10px; flex-shrink: 0; }
+  .gol-nombre { font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 500; color: var(--text-pri); }
+  .gol-cantidad { color: var(--text-dim); font-size: 10px; }
+  .sin-goles { font-size: 11px; color: var(--text-dim); font-style: italic; margin-top: 2px; }
+
+  /* Footer: MVP */
+  .partido-footer {
+    border-top: 1px solid rgba(30,48,74,.6);
+    padding: 6px 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .mvp-label {
+    font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--gold);
+    flex-shrink: 0;
+  }
+  .mvp-nombre {
+    font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 500;
+    color: var(--text-pri); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .mvp-equipo { font-size: 10px; color: var(--text-dim); flex-shrink: 0; }
+  .mvp-val {
+    margin-left: auto; flex-shrink: 0;
+    font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; color: var(--gold);
+  }
+
+  /* ══ FOOTER ══ */
+  footer {
+    flex-shrink: 0; background: var(--bg-panel); border-top: 1px solid var(--border);
+    padding: 7px 24px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-name {
+    font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), #0095c8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .footer-ver { font-size: 12px; color: var(--text-dim); }
+  .btn-reset {
+    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+    text-decoration: none; border: 1px solid var(--border); padding: 4px 10px;
+    border-radius: 3px; transition: all .18s;
+  }
+  .btn-reset:hover { color: var(--red); border-color: var(--red); background: rgba(255,61,90,.08); }
+
+  .btn-volver {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-sec); text-decoration: none;
+    border: 1px solid var(--border); padding: 7px 20px; border-radius: 5px;
+    transition: all .18s;
+  }
+  .btn-volver:hover { color: var(--accent); border-color: var(--accent); background: rgba(0,212,255,.06); }
+
+  /* Móvil */
+  .mobile-block {
+    display: none; position: fixed; inset: 0; background: #080c12; z-index: 9999;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px; padding: 32px; text-align: center;
+  }
+  .mobile-block-icon { font-size: 48px; }
+  .mobile-block h2 { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #00d4ff; }
+  .mobile-block p { font-family: 'Exo 2', sans-serif; font-size: 14px; color: #8ab0cc; line-height: 1.7; max-width: 300px; }
+  @media (max-width: 1024px) { .mobile-block { display: flex; } }
+</style>
+</head>
+<body>
+<div class="mobile-block">
+  <div class="mobile-block-icon">🖥️</div>
+  <h2>Escritorio requerido</h2>
+  <p>Tactical Eleven está diseñado para pantallas grandes.<br>Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
+</div>
+
+<!-- TOP BAR MINIMALISTA -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">Tactical Eleven</div>
+    <div class="topbar-jornada">
+      Resultados &middot;
+      {% for item in datos_ligas %}{% if item.liga.id == liga.id %}<span>Jornada {{ item.jornada }}</span> · {{ item.liga.nombre }}{% endif %}{% endfor %}
+    </div>
+  </div>
+  <a href="{% url 'dashboard' %}" class="btn-continuar">
+    &#9654; Salir <span class="atajo">[S]</span>
+  </a>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- TABS -->
+  <div class="liga-tabs">
+    {% for item in datos_ligas %}
+    <div class="liga-tab {% if item.liga.id == liga.id %}active{% endif %}"
+         data-panel="panel-{{ item.liga.id }}">
+      <img class="liga-tab-logo" src="{% static 'core/img/logo_d' %}{{ item.liga.nivel }}.png" alt="{{ item.liga.nombre }}">
+      <span class="liga-tab-nombre">{{ item.liga.nombre }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- PANELES POR LIGA -->
+  {% for item in datos_ligas %}
+  <div class="liga-panel {% if item.liga.id == liga.id %}visible{% endif %}" id="panel-{{ item.liga.id }}">
+
+    <div class="partidos-grid">
+      {% for pd in item.partidos %}
+      {% with p=pd.partido %}
+      <div class="partido-card {% if pd.es_mi_partido %}mi-partido{% endif %}">
+
+        <!-- RESULTADO -->
+        <div class="partido-header">
+
+          <!-- Local -->
+          <div class="equipo-lado">
+            <img class="escudo-partido" src="{% static 'core/img/'|add:p.equipo_local.abreviatura|add:'.png' %}" alt="{{ p.equipo_local.abreviatura }}">
+            <span class="equipo-card-nombre {% if p.goles_local > p.goles_visitante %}ganador{% endif %}">
+              {{ p.equipo_local.nombre_corto }}
+            </span>
+          </div>
+
+          <!-- Marcador -->
+          <div class="marcador">
+            <span class="gol {% if p.goles_local > p.goles_visitante %}ganador{% endif %}">{{ p.goles_local }}</span>
+            <span class="sep-marcador">–</span>
+            <span class="gol {% if p.goles_visitante > p.goles_local %}ganador{% endif %}">{{ p.goles_visitante }}</span>
+          </div>
+
+          <!-- Visitante -->
+          <div class="equipo-lado visitante">
+            <span class="equipo-card-nombre {% if p.goles_visitante > p.goles_local %}ganador{% endif %}">
+              {{ p.equipo_visitante.nombre_corto }}
+            </span>
+            <img class="escudo-partido" src="{% static 'core/img/'|add:p.equipo_visitante.abreviatura|add:'.png' %}" alt="{{ p.equipo_visitante.abreviatura }}">
+          </div>
+        </div>
+
+        <!-- GOLEADORES -->
+        <div class="partido-body">
+          <!-- Local -->
+          <div class="goleadores-col">
+            {% for g in pd.goles_local %}
+            <div class="gol-item">
+              <span class="gol-icon">⚽</span>
+              <span class="gol-nombre">{{ g.jugador.apellidos }}</span>
+              {% if g.goles > 1 %}<span class="gol-cantidad">({{ g.goles }})</span>{% endif %}
+            </div>
+            {% empty %}
+            <span class="sin-goles">—</span>
+            {% endfor %}
+          </div>
+          <!-- Visitante -->
+          <div class="goleadores-col visitante">
+            {% for g in pd.goles_visit %}
+            <div class="gol-item">
+              <span class="gol-icon">⚽</span>
+              <span class="gol-nombre">{{ g.jugador.apellidos }}</span>
+              {% if g.goles > 1 %}<span class="gol-cantidad">({{ g.goles }})</span>{% endif %}
+            </div>
+            {% empty %}
+            <span class="sin-goles">—</span>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+      {% endwith %}
+      {% endfor %}
+    </div>
+
+  </div>
+  {% endfor %}
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-name">Tactical Eleven</div>
+  <div class="footer-ver">{{ liga.nombre }} &middot; {{ liga.temporada }}</div>
+  <div class="footer-ver">Versi&oacute;n 0.1.0 Alpha</div>
+</footer>
+
+<script>
+  // Tabs
+  document.querySelectorAll('.liga-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var panelId = tab.dataset.panel;
+      document.querySelectorAll('.liga-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.liga-panel').forEach(function(p) { p.classList.remove('visible'); });
+      tab.classList.add('active');
+      document.getElementById(panelId).classList.add('visible');
+      // Actualizar subtítulo
+      var nombre = tab.querySelector('.liga-tab-nombre').textContent;
+      var badge  = document.querySelector('#' + panelId + ' .jornada-badge');
+      document.getElementById('sub-titulo').textContent = nombre + (badge ? ' · ' + badge.textContent : '');
+    });
+  });
+
+  // Atajo teclado: Intro o espacio → Continuar
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 's' || e.key === ' ') {
+      window.location.href = "{% url 'dashboard' %}";
+    }
+  });
+</script>
+
+</body>
+</html>

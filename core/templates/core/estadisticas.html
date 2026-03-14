@@ -16,7 +16,6 @@
     --border:     #1e304a;
     --border-lit: #2a4668;
     --accent:     #00d4ff;
-    --accent2:    #ff6b35;
     --gold:       #ffc337;
     --silver:     #c0c8d0;
     --bronze:     #cd7f32;
@@ -32,8 +31,7 @@
 
   body {
     font-family: 'Exo 2', sans-serif;
-    background: var(--bg-deep);
-    color: var(--text-pri);
+    background: var(--bg-deep); color: var(--text-pri);
     display: flex; flex-direction: column;
     background-image:
       radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0,80,160,.18) 0%, transparent 70%),
@@ -41,30 +39,29 @@
       repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,74,.08) 40px);
   }
 
-  /* ══════ TOP BAR */
+  /* ══ TOPBAR ══ */
   .topbar {
     flex-shrink: 0;
     background: linear-gradient(135deg, #090f1a 0%, #0e1b2a 100%);
     border-bottom: 2px solid var(--border);
     display: flex; align-items: center;
     height: 64px; padding: 0 24px;
-    box-shadow: 0 2px 24px rgba(0,0,0,.8);
-    z-index: 100;
+    box-shadow: 0 2px 24px rgba(0,0,0,.8); z-index: 100;
   }
-  .topbar-logo {
+  a.topbar-logo {
     font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700;
     letter-spacing: 4px; text-transform: uppercase;
     background: linear-gradient(90deg, var(--accent), #0095c8);
     -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     padding-right: 28px; border-right: 1px solid var(--border);
-    white-space: nowrap; flex-shrink: 0;
+    white-space: nowrap; flex-shrink: 0; text-decoration: none;
   }
   .topbar-team {
     display: flex; align-items: center; gap: 12px;
     padding: 0 28px; border-right: 1px solid var(--border); flex-shrink: 0;
   }
-  .escudo-top { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
-  .team-name  { font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 600; letter-spacing: 1px; color: var(--text-pri); line-height: 1.1; }
+  .escudo-top { width: 36px; height: 36px; object-fit: contain; }
+  .team-name   { font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 600; letter-spacing: 1px; color: var(--text-pri); line-height: 1.1; }
   .team-league { font-size: 12px; color: var(--text-sec); text-transform: uppercase; letter-spacing: .8px; }
   .topbar-stat { display: flex; flex-direction: column; padding: 0 28px; border-right: 1px solid var(--border); gap: 1px; flex-shrink: 0; }
   .topbar-stat .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); }
@@ -83,16 +80,13 @@
   .nav-btn:hover  { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.06); }
   .nav-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.12); }
 
-  /* ══════ MAIN */
+  /* ══ MAIN ══ */
   .main {
     flex: 1; overflow: hidden;
-    padding: 18px 28px 12px;
-    display: flex; flex-direction: column; gap: 14px;
+    padding: 14px 28px 10px;
+    display: flex; flex-direction: column; gap: 12px;
   }
-
-  .page-title {
-    display: flex; align-items: baseline; gap: 14px; flex-shrink: 0;
-  }
+  .page-title { display: flex; align-items: baseline; gap: 14px; flex-shrink: 0; }
   .page-title h1 {
     font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700;
     letter-spacing: 3px; text-transform: uppercase; color: var(--text-pri);
@@ -100,29 +94,48 @@
   .page-title .sub { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; }
   .title-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-lit), transparent); margin-bottom: 3px; }
 
-  /* ══════ GRID 3 COLUMNAS */
+  /* ══ TABS ══ */
+  .liga-tabs { display: flex; gap: 10px; flex-shrink: 0; }
+  .liga-tab {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 8px 20px; min-width: 130px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer; transition: all .18s;
+  }
+  .liga-tab:hover { background: var(--bg-hover); border-color: var(--border-lit); }
+  .liga-tab.active {
+    background: rgba(0,212,255,.08); border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 4px 16px rgba(0,212,255,.12);
+  }
+  .liga-tab-logo { height: 32px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); transition: transform .18s; }
+  .liga-tab:hover .liga-tab-logo,
+  .liga-tab.active .liga-tab-logo { transform: scale(1.08); }
+  .liga-tab-nombre {
+    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--text-sec); transition: color .18s;
+  }
+  .liga-tab.active .liga-tab-nombre { color: var(--accent); }
+  .liga-tab:hover .liga-tab-nombre  { color: var(--text-pri); }
+
+  /* ══ PANELES ══ */
+  .liga-panel { display: none; flex: 1; min-height: 0; }
+  .liga-panel.visible { display: flex; }
+
+  /* ══ GRID 3 COLUMNAS ══ */
   .stats-grid {
     flex: 1; min-height: 0;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 18px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px;
   }
 
-  /* ══════ COLUMNA */
+  /* ══ COLUMNA ══ */
   .stat-col {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
     display: flex; flex-direction: column;
   }
-
-  /* Cabecera de columna */
   .col-header {
-    flex-shrink: 0;
-    padding: 10px 16px 9px;
-    background: rgba(255,255,255,.03);
-    border-bottom: 2px solid var(--border);
+    flex-shrink: 0; padding: 10px 16px 9px;
+    background: rgba(255,255,255,.03); border-bottom: 2px solid var(--border);
     display: flex; align-items: center; gap: 10px;
   }
   .col-icon {
@@ -130,70 +143,51 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 14px; flex-shrink: 0;
   }
-  .icon-gol  { background: rgba(255,195,55,.12); }
-  .icon-ast  { background: rgba(0,200,117,.12); }
-  .icon-val  { background: rgba(0,212,255,.12); }
+  .icon-gol { background: rgba(255,195,55,.12); }
+  .icon-ast { background: rgba(0,200,117,.12); }
+  .icon-val { background: rgba(0,212,255,.12); }
   .col-title {
     font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase; color: var(--text-pri);
   }
-  .col-sub {
-    font-size: 11px; color: var(--text-dim); letter-spacing: .8px;
-    text-transform: uppercase; margin-left: auto;
-  }
+  .col-sub { font-size: 11px; color: var(--text-dim); letter-spacing: .8px; text-transform: uppercase; margin-left: auto; }
 
-  /* Fila de jugador */
+  /* ══ FILAS ══ */
   .col-body { flex: 1; overflow-y: auto; }
   .col-body::-webkit-scrollbar { width: 4px; }
   .col-body::-webkit-scrollbar-track { background: var(--bg-card); }
   .col-body::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 2px; }
 
   .player-row {
-    display: grid;
-    grid-template-columns: 36px 36px 1fr auto;
-    align-items: center;
-    gap: 10px;
-    padding: 0 14px;
-    height: 52px;
+    display: grid; grid-template-columns: 36px 36px 1fr auto;
+    align-items: center; gap: 10px;
+    padding: 0 14px; height: 52px;
     border-bottom: 1px solid rgba(30,48,74,.4);
     transition: background .12s;
   }
   .player-row:hover { background: var(--bg-hover); }
-  .player-row.mi-jugador {
-    background: rgba(0,212,255,.07);
-    border-left: 3px solid var(--accent);
-  }
+  .player-row.mi-jugador { background: rgba(0,212,255,.07); border-left: 3px solid var(--accent); }
   .player-row.mi-jugador:hover { background: rgba(0,212,255,.11); }
 
-  /* Posición en ranking */
   .rank {
     font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 700;
-    color: var(--text-dim);
-    display: flex; align-items: center; justify-content: center;
+    color: var(--text-dim); display: flex; align-items: center; justify-content: center;
   }
   .rank-1 { color: var(--gold); }
   .rank-2 { color: var(--silver); }
   .rank-3 { color: var(--bronze); }
 
-  /* Escudo pequeño del equipo */
   .escudo-xs { width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; }
 
-  /* Info del jugador */
   .player-info { min-width: 0; }
   .player-name {
     font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600;
     color: var(--text-pri); letter-spacing: .2px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    line-height: 1.2;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;
   }
   .player-row.mi-jugador .player-name { color: var(--accent); }
-  .player-club {
-    font-size: 12px; color: var(--text-dim);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    letter-spacing: .5px;
-  }
+  .player-club { font-size: 12px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .5px; }
 
-  /* Valor estadístico */
   .stat-val {
     font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700;
     text-align: right; white-space: nowrap; flex-shrink: 0;
@@ -202,13 +196,9 @@
   .val-ast { color: var(--green); }
   .val-rat { color: var(--accent); }
 
-  /* Vacío */
-  .empty-msg {
-    padding: 32px 16px; text-align: center;
-    font-size: 13px; color: var(--text-dim); letter-spacing: .5px;
-  }
+  .empty-msg { padding: 32px 16px; text-align: center; font-size: 13px; color: var(--text-dim); letter-spacing: .5px; }
 
-  /* Footer */
+  /* ══ FOOTER ══ */
   footer {
     flex-shrink: 0; background: var(--bg-panel); border-top: 1px solid var(--border);
     padding: 7px 24px; display: flex; align-items: center; justify-content: space-between;
@@ -222,61 +212,32 @@
   .footer-ver { font-size: 12px; color: var(--text-dim); }
   .btn-reset {
     font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-dim); text-decoration: none;
-    border: 1px solid var(--border); padding: 4px 10px; border-radius: 3px;
-    transition: all .18s;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+    text-decoration: none; border: 1px solid var(--border); padding: 4px 10px;
+    border-radius: 3px; transition: all .18s;
   }
   .btn-reset:hover { color: var(--red); border-color: var(--red); background: rgba(255,61,90,.08); }
 
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--bg-deep); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-  /* ── Bloqueo móvil ── */
   .mobile-block {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #080c12;
-    z-index: 9999;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 32px;
-    text-align: center;
+    display: none; position: fixed; inset: 0; background: #080c12; z-index: 9999;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px; padding: 32px; text-align: center;
   }
   .mobile-block-icon { font-size: 48px; }
-  .mobile-block h2 {
-    font-family: 'Oswald', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #00d4ff;
-  }
-  .mobile-block p {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 14px;
-    color: #8ab0cc;
-    line-height: 1.7;
-    max-width: 300px;
-  }
-  @media (max-width: 1024px) {
-    .mobile-block { display: flex; }
-  }
+  .mobile-block h2 { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #00d4ff; }
+  .mobile-block p { font-family: 'Exo 2', sans-serif; font-size: 14px; color: #8ab0cc; line-height: 1.7; max-width: 300px; }
+  @media (max-width: 1024px) { .mobile-block { display: flex; } }
 </style>
 </head>
 <body>
 <div class="mobile-block">
   <div class="mobile-block-icon">🖥️</div>
   <h2>Escritorio requerido</h2>
-  <p>Tactical Eleven está diseñado para pantallas grandes.<br>
-  Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
+  <p>Tactical Eleven está diseñado para pantallas grandes.<br>Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
 </div>
-<!-- TOP BAR -->
+
 <header class="topbar">
-  <div class="topbar-logo">Tactical Eleven</div>
+  <a href="{% url 'dashboard' %}" class="topbar-logo">Tactical Eleven</a>
   <div class="topbar-team">
     <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
     <div>
@@ -308,66 +269,122 @@
   </nav>
 </header>
 
-
-<!-- MAIN -->
 <main class="main">
 
   <div class="page-title">
     <h1>Estad&iacute;sticas</h1>
-    <span class="sub">{{ liga.nombre }} &middot; {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual|add:"-1" }}</span>
+    <span class="sub" id="page-sub">{{ liga.nombre }} &middot; {{ liga.temporada }}</span>
     <div class="title-line"></div>
   </div>
 
-  <div class="stats-grid">
-
-    <!-- ══ MÁXIMOS GOLEADORES ══ -->
-    <div class="stat-col">
-      <div class="col-header">
-        <div class="col-icon icon-gol">&#9917;</div>
-        <span class="col-title">Goleadores</span>
-        <span class="col-sub">Goles</span>
-      </div>
-      <div class="col-body">
-        {% if top_goleadores %}{% for j in top_goleadores %}{% with abr=j.jugador__equipo__abreviatura %}<div class="player-row" data-miequipo="{% if j.jugador__equipo__nombre_corto == equipo.nombre_corto %}1{% endif %}"><div class="rank" data-pos="{{ forloop.counter }}">{{ forloop.counter }}</div><img class="escudo-xs" src="{% static 'core/img/' %}{{ abr }}.png" alt="{{ j.jugador__equipo__nombre_corto }}"><div class="player-info"><div class="player-name">{{ j.jugador__nombre }} {{ j.jugador__apellidos }}</div><div class="player-club">{{ j.jugador__equipo__nombre_corto }}</div></div><div class="stat-val val-gol">{{ j.total_goles }}</div></div>{% endwith %}{% endfor %}{% else %}<div class="empty-msg">Sin datos todav&iacute;a</div>{% endif %}
-      </div>
+  <!-- TABS -->
+  <div class="liga-tabs">
+    {% for item in ligas_stats %}
+    <div class="liga-tab {% if item.liga.id == liga.id %}active{% endif %}"
+         data-panel="panel-stats-{{ item.liga.id }}"
+         data-nombre="{{ item.liga.nombre }}"
+         data-temporada="{{ item.liga.temporada }}">
+      <img class="liga-tab-logo" src="{% static 'core/img/logo_d' %}{{ item.liga.nivel }}.png" alt="{{ item.liga.nombre }}">
+      <span class="liga-tab-nombre">{{ item.liga.nombre }}</span>
     </div>
-
-    <!-- ══ MÁXIMOS ASISTENTES ══ -->
-    <div class="stat-col">
-      <div class="col-header">
-        <div class="col-icon icon-ast">&#128084;</div>
-        <span class="col-title">Asistentes</span>
-        <span class="col-sub">Asistencias</span>
-      </div>
-      <div class="col-body">
-        {% if top_asistentes %}{% for j in top_asistentes %}{% with abr=j.jugador__equipo__abreviatura %}<div class="player-row" data-miequipo="{% if j.jugador__equipo__nombre_corto == equipo.nombre_corto %}1{% endif %}"><div class="rank" data-pos="{{ forloop.counter }}">{{ forloop.counter }}</div><img class="escudo-xs" src="{% static 'core/img/' %}{{ abr }}.png" alt="{{ j.jugador__equipo__nombre_corto }}"><div class="player-info"><div class="player-name">{{ j.jugador__nombre }} {{ j.jugador__apellidos }}</div><div class="player-club">{{ j.jugador__equipo__nombre_corto }}</div></div><div class="stat-val val-ast">{{ j.total_asistencias }}</div></div>{% endwith %}{% endfor %}{% else %}<div class="empty-msg">Sin datos todav&iacute;a</div>{% endif %}
-      </div>
-    </div>
-
-    <!-- ══ MEJOR VALORACIÓN ══ -->
-    <div class="stat-col">
-      <div class="col-header">
-        <div class="col-icon icon-val">&#11088;</div>
-        <span class="col-title">Valoraci&oacute;n</span>
-        <span class="col-sub">Media</span>
-      </div>
-      <div class="col-body">
-        {% if top_valoracion %}{% for j in top_valoracion %}{% with abr=j.jugador__equipo__abreviatura %}<div class="player-row" data-miequipo="{% if j.jugador__equipo__nombre_corto == equipo.nombre_corto %}1{% endif %}"><div class="rank" data-pos="{{ forloop.counter }}">{{ forloop.counter }}</div><img class="escudo-xs" src="{% static 'core/img/' %}{{ abr }}.png" alt="{{ j.jugador__equipo__nombre_corto }}"><div class="player-info"><div class="player-name">{{ j.jugador__nombre }} {{ j.jugador__apellidos }}</div><div class="player-club">{{ j.jugador__equipo__nombre_corto }}</div></div><div class="stat-val val-rat">{{ j.media_valoracion|floatformat:2 }}</div></div>{% endwith %}{% endfor %}{% else %}<div class="empty-msg">Sin datos todav&iacute;a</div>{% endif %}
-      </div>
-    </div>
-
+    {% endfor %}
   </div>
+
+  <!-- PANEL POR LIGA -->
+  {% for item in ligas_stats %}
+  <div class="liga-panel {% if item.liga.id == liga.id %}visible{% endif %}" id="panel-stats-{{ item.liga.id }}">
+    <div class="stats-grid">
+
+      <!-- GOLEADORES -->
+      <div class="stat-col">
+        <div class="col-header">
+          <div class="col-icon icon-gol">&#9917;</div>
+          <span class="col-title">Goleadores</span>
+          <span class="col-sub">Goles</span>
+        </div>
+        <div class="col-body">
+          {% if item.top_goleadores %}
+            {% for j in item.top_goleadores %}
+            <div class="player-row{% if j.jugador__equipo__nombre_corto == equipo.nombre_corto %} mi-jugador{% endif %}">
+              <div class="rank{% if forloop.counter == 1 %} rank-1{% elif forloop.counter == 2 %} rank-2{% elif forloop.counter == 3 %} rank-3{% endif %}">{{ forloop.counter }}</div>
+              <img class="escudo-xs" src="{% static 'core/img/' %}{{ j.jugador__equipo__abreviatura }}.png" alt="{{ j.jugador__equipo__nombre_corto }}">
+              <div class="player-info">
+                <div class="player-name">{{ j.jugador__nombre }} {{ j.jugador__apellidos }}</div>
+                <div class="player-club">{{ j.jugador__equipo__nombre_corto }}</div>
+              </div>
+              <div class="stat-val val-gol">{{ j.total_goles }}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-msg">Sin datos todav&iacute;a</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ASISTENTES -->
+      <div class="stat-col">
+        <div class="col-header">
+          <div class="col-icon icon-ast">&#128084;</div>
+          <span class="col-title">Asistentes</span>
+          <span class="col-sub">Asistencias</span>
+        </div>
+        <div class="col-body">
+          {% if item.top_asistentes %}
+            {% for j in item.top_asistentes %}
+            <div class="player-row{% if j.jugador__equipo__nombre_corto == equipo.nombre_corto %} mi-jugador{% endif %}">
+              <div class="rank{% if forloop.counter == 1 %} rank-1{% elif forloop.counter == 2 %} rank-2{% elif forloop.counter == 3 %} rank-3{% endif %}">{{ forloop.counter }}</div>
+              <img class="escudo-xs" src="{% static 'core/img/' %}{{ j.jugador__equipo__abreviatura }}.png" alt="{{ j.jugador__equipo__nombre_corto }}">
+              <div class="player-info">
+                <div class="player-name">{{ j.jugador__nombre }} {{ j.jugador__apellidos }}</div>
+                <div class="player-club">{{ j.jugador__equipo__nombre_corto }}</div>
+              </div>
+              <div class="stat-val val-ast">{{ j.total_asistencias }}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-msg">Sin datos todav&iacute;a</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- VALORACIÓN -->
+      <div class="stat-col">
+        <div class="col-header">
+          <div class="col-icon icon-val">&#11088;</div>
+          <span class="col-title">Valoraci&oacute;n</span>
+          <span class="col-sub">Media</span>
+        </div>
+        <div class="col-body">
+          {% if item.top_valoracion %}
+            {% for j in item.top_valoracion %}
+            <div class="player-row{% if j.jugador__equipo__nombre_corto == equipo.nombre_corto %} mi-jugador{% endif %}">
+              <div class="rank{% if forloop.counter == 1 %} rank-1{% elif forloop.counter == 2 %} rank-2{% elif forloop.counter == 3 %} rank-3{% endif %}">{{ forloop.counter }}</div>
+              <img class="escudo-xs" src="{% static 'core/img/' %}{{ j.jugador__equipo__abreviatura }}.png" alt="{{ j.jugador__equipo__nombre_corto }}">
+              <div class="player-info">
+                <div class="player-name">{{ j.jugador__nombre }} {{ j.jugador__apellidos }}</div>
+                <div class="player-club">{{ j.jugador__equipo__nombre_corto }}</div>
+              </div>
+              <div class="stat-val val-rat">{{ j.media_valoracion|floatformat:2 }}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-msg">Sin datos todav&iacute;a</div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+
 </main>
 
-
-<!-- FOOTER -->
 <footer>
   <div class="footer-name">Tactical Eleven</div>
   <div class="footer-ver">{{ liga.nombre }} {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual }}</div>
   <div style="display:flex; align-items:center; gap:16px;">
     <div class="footer-ver">Versi&oacute;n 0.1.0 Alpha</div>
-    <a href="{% url 'reset_juego' %}"
-       class="btn-reset"
+    <a href="{% url 'reset_juego' %}" class="btn-reset"
        onclick="return confirm('Seguro? Se borraran todos los datos y empezaras desde cero.')">
       &#8635; Nueva Partida
     </a>
@@ -375,21 +392,16 @@
 </footer>
 
 <script>
-
-
-  // Mi equipo → resaltado azul
-  document.querySelectorAll('[data-miequipo="1"]').forEach(function(el) {
-    el.classList.add('mi-jugador');
-  });
-
-  // Posición → oro / plata / bronce
-  document.querySelectorAll('.rank[data-pos]').forEach(function(el) {
-    const pos = parseInt(el.getAttribute('data-pos'));
-    if (pos === 1) el.classList.add('rank-1');
-    else if (pos === 2) el.classList.add('rank-2');
-    else if (pos === 3) el.classList.add('rank-3');
+  document.querySelectorAll('.liga-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.liga-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.liga-panel').forEach(function(p) { p.classList.remove('visible'); });
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.panel).classList.add('visible');
+      document.getElementById('page-sub').textContent =
+        tab.dataset.nombre + ' · ' + tab.dataset.temporada;
+    });
   });
 </script>
-
 </body>
 </html>

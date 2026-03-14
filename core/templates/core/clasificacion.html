@@ -25,6 +25,7 @@
     --text-dim:   #3d5a75;
     --green:      #00c875;
     --red:        #ff3d5a;
+    --purple:     #a855f7;
     --yellow:     #ffc337;
   }
 
@@ -52,13 +53,13 @@
     box-shadow: 0 2px 24px rgba(0,0,0,.8);
     z-index: 100;
   }
-  .topbar-logo {
+  a.topbar-logo {
     font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700;
     letter-spacing: 4px; text-transform: uppercase;
     background: linear-gradient(90deg, var(--accent), #0095c8);
     -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     padding-right: 28px; border-right: 1px solid var(--border);
-    white-space: nowrap; flex-shrink: 0;
+    white-space: nowrap; flex-shrink: 0; text-decoration: none;
   }
   .topbar-team {
     display: flex; align-items: center; gap: 12px;
@@ -87,8 +88,8 @@
   /* ══════ MAIN */
   .main {
     flex: 1; overflow: hidden;
-    padding: 18px 28px 12px;
-    display: flex; flex-direction: column; gap: 14px;
+    padding: 14px 28px 10px;
+    display: flex; flex-direction: column; gap: 12px;
   }
 
   .page-title {
@@ -100,6 +101,37 @@
   }
   .page-title .sub { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; }
   .title-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-lit), transparent); margin-bottom: 3px; }
+
+  /* ══════ TABS DE LIGA */
+  .liga-tabs {
+    display: flex; gap: 10px; flex-shrink: 0;
+  }
+  .liga-tab {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 8px 20px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer; transition: all .18s;
+    min-width: 130px;
+  }
+  .liga-tab:hover { background: var(--bg-hover); border-color: var(--border-lit); }
+  .liga-tab.active {
+    background: rgba(0,212,255,.08); border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 4px 16px rgba(0,212,255,.12);
+  }
+  .liga-tab-logo {
+    height: 32px; width: auto; object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.5));
+    transition: transform .18s;
+  }
+  .liga-tab:hover .liga-tab-logo,
+  .liga-tab.active .liga-tab-logo { transform: scale(1.08); }
+  .liga-tab-nombre {
+    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--text-sec);
+    transition: color .18s;
+  }
+  .liga-tab.active .liga-tab-nombre { color: var(--accent); }
+  .liga-tab:hover .liga-tab-nombre { color: var(--text-pri); }
 
   /* ══════ LAYOUT */
   .clas-layout {
@@ -135,7 +167,6 @@
   .tabla-body::-webkit-scrollbar-track { background: var(--bg-card); }
   .tabla-body::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 2px; }
 
-  /* Fila compacta: altura reducida */
   .fila {
     display: grid;
     grid-template-columns: 38px 32px 1fr 42px 42px 42px 42px 42px 42px 52px 58px;
@@ -144,31 +175,40 @@
     align-items: center;
     border-bottom: 1px solid rgba(30,48,74,.4);
     transition: background .12s;
+    border-left: 3px solid transparent;
   }
   .fila:hover { background: var(--bg-hover); }
   .fila.mi-equipo {
     background: rgba(0,212,255,.07);
-    border-left: 3px solid var(--accent);
+    border-left-color: var(--accent);
   }
   .fila.mi-equipo:hover { background: rgba(0,212,255,.11); }
-  .fila.sep-desc { border-top: 2px solid rgba(255,61,90,.4); }
+
+  /* Separadores de zona */
+  .fila.sep-champions { border-top: 2px solid rgba(168,85,247,.5); }
+  .fila.sep-ascenso   { border-top: 2px solid rgba(0,200,117,.5); }
+  .fila.sep-descenso  { border-top: 2px solid rgba(255,61,90,.5); }
+
+  /* Franja lateral de zona */
+  .fila.zona-champions { border-left-color: var(--purple); background: rgba(168,85,247,.04); }
+  .fila.zona-ascenso   { border-left-color: var(--green);  background: rgba(0,200,117,.04); }
+  .fila.zona-descenso  { border-left-color: var(--red);    background: rgba(255,61,90,.04); }
+  .fila.mi-equipo      { border-left-color: var(--accent) !important; background: rgba(0,212,255,.07) !important; }
 
   .td { text-align: center; }
   .td.left { text-align: left; }
 
-  /* Posición */
   .pos {
     font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700;
     text-align: center; width: 24px; display: inline-block;
   }
-  .pos-1    { color: var(--gold); }
-  .pos-2    { color: var(--silver); }
-  .pos-nor  { color: var(--text-dim); }
-  .pos-desc { color: var(--red); }
+  .pos-champions { color: var(--purple); }
+  .pos-ascenso   { color: var(--green); }
+  .pos-1         { color: var(--gold); }
+  .pos-desc      { color: var(--red); }
+  .pos-nor       { color: var(--text-dim); }
 
-  /* Escudo */
   .escudo-sm { width: 22px; height: 22px; object-fit: contain; }
-
   .club-info { display: flex; align-items: center; gap: 8px; }
   .club-nombre {
     font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600;
@@ -188,7 +228,6 @@
   .dif-pos { color: var(--green); }
   .dif-neg { color: var(--red); }
   .dif-neu { color: var(--text-dim); }
-
   .td-pts {
     font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700;
     text-align: center; color: var(--text-pri);
@@ -196,11 +235,14 @@
   .fila.mi-equipo .td-pts { color: var(--accent); }
 
   /* ══════ LATERAL */
-  .lateral { display: flex; flex-direction: column; gap: 12px; }
+  .lateral { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+  .lateral::-webkit-scrollbar { width: 4px; }
+  .lateral::-webkit-scrollbar-track { background: var(--bg-card); }
+  .lateral::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 2px; }
 
   .card-side {
     background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden;
+    border-radius: 10px; overflow: hidden; flex-shrink: 0;
   }
   .side-title {
     font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 600;
@@ -215,9 +257,9 @@
   .leyenda-list { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
   .leyenda-item { display: flex; align-items: center; gap: 10px; }
   .leyenda-color { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-  .lc-campeon  { background: var(--gold); }
-  .lc-sub      { background: var(--silver); }
-  .lc-desc     { background: var(--red); }
+  .lc-champions { background: var(--purple); }
+  .lc-ascenso   { background: var(--green); }
+  .lc-desc      { background: var(--red); }
   .leyenda-txt { font-size: 13px; color: var(--text-sec); flex: 1; }
   .leyenda-pos { font-family: 'Oswald', sans-serif; font-size: 12px; color: var(--text-dim); }
 
@@ -261,51 +303,31 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg-deep); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-  /* ── Bloqueo móvil ── */
+
   .mobile-block {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #080c12;
-    z-index: 9999;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 32px;
-    text-align: center;
+    display: none; position: fixed; inset: 0; background: #080c12; z-index: 9999;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px; padding: 32px; text-align: center;
   }
   .mobile-block-icon { font-size: 48px; }
   .mobile-block h2 {
-    font-family: 'Oswald', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #00d4ff;
+    font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: #00d4ff;
   }
-  .mobile-block p {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 14px;
-    color: #8ab0cc;
-    line-height: 1.7;
-    max-width: 300px;
-  }
-  @media (max-width: 1024px) {
-    .mobile-block { display: flex; }
-  }
+  .mobile-block p { font-family: 'Exo 2', sans-serif; font-size: 14px; color: #8ab0cc; line-height: 1.7; max-width: 300px; }
+  @media (max-width: 1024px) { .mobile-block { display: flex; } }
 </style>
 </head>
 <body>
 <div class="mobile-block">
   <div class="mobile-block-icon">🖥️</div>
   <h2>Escritorio requerido</h2>
-  <p>Tactical Eleven está diseñado para pantallas grandes.<br>
-  Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
+  <p>Tactical Eleven está diseñado para pantallas grandes.<br>Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
 </div>
+
 <!-- TOP BAR -->
 <header class="topbar">
-  <div class="topbar-logo">Tactical Eleven</div>
+  <a href="{% url 'dashboard' %}" class="topbar-logo">Tactical Eleven</a>
   <div class="topbar-team">
     <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
     <div>
@@ -337,14 +359,26 @@
   </nav>
 </header>
 
-
 <!-- MAIN -->
 <main class="main">
 
   <div class="page-title">
     <h1>Clasificaci&oacute;n</h1>
-    <span class="sub">{{ liga.nombre }} &middot; {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual|add:"-1" }}</span>
+    <span class="sub" id="sub-titulo">{{ liga.nombre }} &middot; {{ liga.temporada }}</span>
     <div class="title-line"></div>
+  </div>
+
+  <!-- TABS DE LIGA -->
+  <div class="liga-tabs">
+    {% for item in tablas_ctx %}
+    <div class="liga-tab {% if item.liga.id == liga.id %}active{% endif %}"
+         data-liga-id="{{ item.liga.id }}"
+         data-nivel="{{ item.liga.nivel }}"
+         data-nombre="{{ item.liga.nombre }}">
+      <img class="liga-tab-logo" src="{% static 'core/img/logo_d' %}{{ item.liga.nivel }}.png" alt="{{ item.liga.nombre }}">
+      <span class="liga-tab-nombre">{{ item.liga.nombre }}</span>
+    </div>
+    {% endfor %}
   </div>
 
   <div class="clas-layout">
@@ -364,138 +398,35 @@
         <div class="th">DIF</div>
         <div class="th">PTS</div>
       </div>
-
-      <div class="tabla-body">
-        {% for c in tabla %}
-        <div class="fila {% if c.equipo == equipo %}mi-equipo {% endif %}{% if c.pos == 18 %}sep-desc{% endif %}">
-
-          <!-- Posición -->
-          <div class="td">
-            <span class="pos
-              {% if c.pos == 1 %}pos-1
-              {% elif c.pos == 2 %}pos-2
-              {% elif c.pos >= 18 %}pos-desc
-              {% else %}pos-nor
-              {% endif %}">{{ c.pos }}</span>
-          </div>
-
-          <!-- Escudo -->
-          <div class="td">
-            <img class="escudo-sm" src="{% static 'core/img/'|add:c.equipo.abreviatura|add:'.png' %}" alt="{{ c.equipo.abreviatura }}">
-          </div>
-
-          <!-- Club -->
-          <div class="td left">
-            <span class="club-nombre">{{ c.equipo.nombre_corto }}</span>
-          </div>
-
-          <!-- Stats -->
-          <div class="td td-num">{{ c.partidos_jugados }}</div>
-          <div class="td td-num">{{ c.partidos_ganados }}</div>
-          <div class="td td-num">{{ c.partidos_empatados }}</div>
-          <div class="td td-num">{{ c.partidos_perdidos }}</div>
-          <div class="td td-num">{{ c.goles_favor }}</div>
-          <div class="td td-num">{{ c.goles_contra }}</div>
-
-          <!-- Diferencia -->
-          <div class="td td-dif
-            {% if c.diferencia_goles > 0 %}dif-pos
-            {% elif c.diferencia_goles < 0 %}dif-neg
-            {% else %}dif-neu
-            {% endif %}">
-            {% if c.diferencia_goles > 0 %}+{% endif %}{{ c.diferencia_goles }}
-          </div>
-
-          <!-- Puntos -->
-          <div class="td td-pts">{{ c.puntos }}</div>
-
-        </div>
-        {% endfor %}
+      <div class="tabla-body" id="tabla-body">
+        <!-- Renderizado por JS -->
       </div>
     </div>
 
     <!-- LATERAL -->
     <div class="lateral">
 
-      <!-- Leyenda -->
+      <!-- Leyenda (se actualiza por JS) -->
       <div class="card-side">
         <div class="side-title"><span class="ic">&#9632;</span> Zonas</div>
-        <div class="leyenda-list">
-          <div class="leyenda-item">
-            <div class="leyenda-color lc-campeon"></div>
-            <span class="leyenda-txt">Campe&oacute;n</span>
-            <span class="leyenda-pos">1&ordm;</span>
-          </div>
-          <div class="leyenda-item">
-            <div class="leyenda-color lc-sub"></div>
-            <span class="leyenda-txt">Subcampe&oacute;n</span>
-            <span class="leyenda-pos">2&ordm;</span>
-          </div>
-          <div class="leyenda-item">
-            <div class="leyenda-color lc-desc"></div>
-            <span class="leyenda-txt">Descenso</span>
-            <span class="leyenda-pos">18&ordm; &ndash; 20&ordm;</span>
-          </div>
+        <div class="leyenda-list" id="leyenda-zonas">
+          <!-- Renderizado por JS -->
         </div>
       </div>
 
       <!-- Mi equipo -->
-      <div class="card-side">
+      <div class="card-side" id="card-mi-equipo">
         <div class="side-title"><span class="ic">&#9917;</span> {{ equipo.nombre_corto }}</div>
-        <div class="mi-resumen">
-          {% for c in tabla %}{% if c.equipo == equipo %}
-          <div class="resumen-fila">
-            <span class="res-lbl">Posici&oacute;n</span>
-            <span class="res-val accent">{{ c.pos }}&#176;</span>
-          </div>
-          <div class="resumen-fila">
-            <span class="res-lbl">Puntos</span>
-            <span class="res-val accent">{{ c.puntos }}</span>
-          </div>
-          <div class="resumen-fila">
-            <span class="res-lbl">Jugados</span>
-            <span class="res-val">{{ c.partidos_jugados }}</span>
-          </div>
-          <div class="resumen-fila">
-            <span class="res-lbl">Victorias</span>
-            <span class="res-val bueno">{{ c.partidos_ganados }}</span>
-          </div>
-          <div class="resumen-fila">
-            <span class="res-lbl">Empates</span>
-            <span class="res-val">{{ c.partidos_empatados }}</span>
-          </div>
-          <div class="resumen-fila">
-            <span class="res-lbl">Derrotas</span>
-            <span class="res-val malo">{{ c.partidos_perdidos }}</span>
-          </div>
-          <div class="resumen-fila">
-            <span class="res-lbl">GF / GC</span>
-            <span class="res-val">{{ c.goles_favor }} / {{ c.goles_contra }}</span>
-          </div>
-          <div class="resumen-fila">
-            <span class="res-lbl">Diferencia</span>
-            <span class="res-val {% if c.diferencia_goles >= 0 %}bueno{% else %}malo{% endif %}">
-              {% if c.diferencia_goles > 0 %}+{% endif %}{{ c.diferencia_goles }}
-            </span>
-          </div>
-          {% endif %}{% endfor %}
+        <div class="mi-resumen" id="mi-resumen-body">
+          <!-- Renderizado por JS -->
         </div>
       </div>
 
-      <!-- Liga -->
+      <!-- Stats de la liga -->
       <div class="card-side">
-        <div class="side-title"><span class="ic">&#128202;</span> Liga</div>
-        <div class="stats-list">
-          <div class="stat-item">
-            <span class="stat-lbl">L&iacute;der</span>
-            <span class="stat-val accent">
-              {% for c in tabla %}{% if c.pos == 1 %}{{ c.equipo.nombre_corto }}{% endif %}{% endfor %}
-            </span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-lbl">Jornada</span>
-            <span class="stat-val">{{ liga.jornada_actual }}</span>
-          </div>
+        <div class="side-title"><span class="ic">&#128202;</span> <span id="stats-liga-titulo">Liga</span></div>
+        <div class="stats-list" id="stats-liga-body">
+          <!-- Renderizado por JS -->
         </div>
       </div>
 
@@ -506,7 +437,7 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-name">Tactical Eleven</div>
-  <div class="footer-ver">{{ liga.nombre }} {{ liga.temporada }} &middot; Jornada {{ liga.jornada_actual }}</div>
+  <div class="footer-ver" id="footer-info">{{ liga.nombre }} {{ liga.temporada }}</div>
   <div style="display:flex; align-items:center; gap:16px;">
     <div class="footer-ver">Versi&oacute;n 0.1.0 Alpha</div>
     <a href="{% url 'reset_juego' %}"
@@ -517,8 +448,202 @@
   </div>
 </footer>
 
-<script>
+<!-- Datos inyectados desde Django -->
+<script type="application/json" id="datos-tablas">
+[
+  {% for item in tablas_ctx %}
+  {
+    "id": {{ item.liga.id }},
+    "nivel": {{ item.liga.nivel }},
+    "nombre": "{{ item.liga.nombre }}",
+    "temporada": "{{ item.liga.temporada }}",
+    "jornada": {{ item.liga.jornada_actual }},
+    "equipos": [
+      {% for c in item.tabla %}
+      {
+        "pos": {{ c.pos }},
+        "nombre": "{{ c.equipo.nombre_corto }}",
+        "abreviatura": "{{ c.equipo.abreviatura }}",
+        "es_mi_equipo": {% if c.equipo == equipo %}true{% else %}false{% endif %},
+        "pj": {{ c.partidos_jugados }},
+        "pg": {{ c.partidos_ganados }},
+        "pe": {{ c.partidos_empatados }},
+        "pp": {{ c.partidos_perdidos }},
+        "gf": {{ c.goles_favor }},
+        "gc": {{ c.goles_contra }},
+        "dif": {{ c.diferencia_goles }},
+        "pts": {{ c.puntos }}
+      }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }{% if not forloop.last %},{% endif %}
+  {% endfor %}
+]
+</script>
 
+<script>
+var STATIC_BASE = "{% static 'core/img/' %}";
+
+// Convertir array a dict por id para acceso rápido
+var tablasArray = JSON.parse(document.getElementById('datos-tablas').textContent);
+var tablas = {};
+tablasArray.forEach(function(t) { tablas[t.id] = t; });
+
+// Leer liga activa del tab marcado como active
+var tabActivo = document.querySelector('.liga-tab.active');
+var ligaActiva = tabActivo ? parseInt(tabActivo.dataset.ligaId) : tablasArray[0].id;
+
+// Añadir listeners a los tabs
+document.querySelectorAll('.liga-tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    var id     = parseInt(tab.dataset.ligaId);
+    var nivel  = parseInt(tab.dataset.nivel);
+    var nombre = tab.dataset.nombre;
+    cambiarLiga(id, nivel, nombre, tab);
+  });
+});
+
+function getZona(pos, nivel) {
+  // Premier (nivel 1): pos 1-4 Champions, pos 18-20 descenso, sin ascenso
+  // Championship/League One (nivel 2-3): pos 1-3 ascenso, pos 18-20 descenso
+  // League Two (nivel 4): pos 1-3 ascenso, pos 17-20 peligro (National League), sin descenso real
+  if (nivel === 1) {
+    if (pos <= 4)  return 'champions';
+    if (pos >= 18) return 'descenso';
+    return 'normal';
+  } else if (nivel === 4) {
+    if (pos <= 3)  return 'ascenso';
+    if (pos >= 17) return 'descenso';
+    return 'normal';
+  } else {
+    if (pos <= 3)  return 'ascenso';
+    if (pos >= 18) return 'descenso';
+    return 'normal';
+  }
+}
+
+function renderTabla(ligaId) {
+  var data   = tablas[ligaId];
+  var nivel  = data.nivel;
+  var equipos = data.equipos;
+  var tbody = document.getElementById('tabla-body');
+  tbody.innerHTML = '';
+
+  equipos.forEach(function(eq) {
+    var zona = getZona(eq.pos, nivel);
+    var prevZona = eq.pos > 1 ? getZona(eq.pos - 1, nivel) : null;
+
+    var clases = 'fila';
+    if (eq.es_mi_equipo) clases += ' mi-equipo';
+    else if (zona === 'champions') clases += ' zona-champions';
+    else if (zona === 'ascenso')   clases += ' zona-ascenso';
+    else if (zona === 'descenso')  clases += ' zona-descenso';
+
+    // Separador visual al entrar en zona nueva
+    if (prevZona !== null && prevZona !== zona) {
+      if (zona === 'champions') clases += ' sep-champions';
+      else if (zona === 'ascenso') clases += ' sep-ascenso';
+      else if (zona === 'descenso') clases += ' sep-descenso';
+      else if (prevZona === 'champions' || prevZona === 'ascenso') clases += ' sep-ascenso';
+    }
+
+    var posClase = 'pos-nor';
+    if (eq.pos === 1) posClase = 'pos-1';
+    else if (zona === 'champions') posClase = 'pos-champions';
+    else if (zona === 'ascenso')   posClase = 'pos-ascenso';
+    else if (zona === 'descenso')  posClase = 'pos-desc';
+
+    var difClase = eq.dif > 0 ? 'dif-pos' : eq.dif < 0 ? 'dif-neg' : 'dif-neu';
+    var difStr   = (eq.dif > 0 ? '+' : '') + eq.dif;
+
+    var row = document.createElement('div');
+    row.className = clases;
+    row.innerHTML =
+      '<div class="td"><span class="pos ' + posClase + '">' + eq.pos + '</span></div>' +
+      '<div class="td"><img class="escudo-sm" src="' + STATIC_BASE + eq.abreviatura + '.png" alt="' + eq.abreviatura + '"></div>' +
+      '<div class="td left"><span class="club-nombre">' + eq.nombre + '</span></div>' +
+      '<div class="td td-num">' + eq.pj + '</div>' +
+      '<div class="td td-num">' + eq.pg + '</div>' +
+      '<div class="td td-num">' + eq.pe + '</div>' +
+      '<div class="td td-num">' + eq.pp + '</div>' +
+      '<div class="td td-num">' + eq.gf + '</div>' +
+      '<div class="td td-num">' + eq.gc + '</div>' +
+      '<div class="td td-dif ' + difClase + '">' + difStr + '</div>' +
+      '<div class="td td-pts">' + eq.pts + '</div>';
+    tbody.appendChild(row);
+  });
+}
+
+function renderLeyenda(nivel) {
+  var leyenda = document.getElementById('leyenda-zonas');
+  var html = '';
+  if (nivel === 1) {
+    html +=
+      '<div class="leyenda-item"><div class="leyenda-color lc-champions"></div><span class="leyenda-txt">UEFA Champions League</span><span class="leyenda-pos">1&ordm;&ndash;4&ordm;</span></div>' +
+      '<div class="leyenda-item"><div class="leyenda-color lc-desc"></div><span class="leyenda-txt">Descenso a Championship</span><span class="leyenda-pos">18&ordm;&ndash;20&ordm;</span></div>';
+  } else if (nivel === 4) {
+    html +=
+      '<div class="leyenda-item"><div class="leyenda-color lc-ascenso"></div><span class="leyenda-txt">Ascenso a League One</span><span class="leyenda-pos">1&ordm;&ndash;3&ordm;</span></div>' +
+      '<div class="leyenda-item"><div class="leyenda-color lc-desc"></div><span class="leyenda-txt">Zona National League</span><span class="leyenda-pos">17&ordm;&ndash;20&ordm;</span></div>';
+  } else {
+    var ligaSup = nivel === 2 ? 'Premier League' : 'Championship';
+    var ligaInf = nivel === 2 ? 'League One' : 'League Two';
+    html +=
+      '<div class="leyenda-item"><div class="leyenda-color lc-ascenso"></div><span class="leyenda-txt">Ascenso a ' + ligaSup + '</span><span class="leyenda-pos">1&ordm;&ndash;3&ordm;</span></div>' +
+      '<div class="leyenda-item"><div class="leyenda-color lc-desc"></div><span class="leyenda-txt">Descenso a ' + ligaInf + '</span><span class="leyenda-pos">18&ordm;&ndash;20&ordm;</span></div>';
+  }
+  leyenda.innerHTML = html;
+}
+
+function renderMiEquipo(ligaId) {
+  var data    = tablas[ligaId];
+  var miEq    = data.equipos.find(function(e) { return e.es_mi_equipo; });
+  var resumen = document.getElementById('mi-resumen-body');
+  var card    = document.getElementById('card-mi-equipo');
+  if (!miEq) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = '';
+  var difStr = (miEq.dif > 0 ? '+' : '') + miEq.dif;
+  var difCls = miEq.dif >= 0 ? 'bueno' : 'malo';
+  resumen.innerHTML =
+    '<div class="resumen-fila"><span class="res-lbl">Posici&oacute;n</span><span class="res-val accent">' + miEq.pos + '&ordm;</span></div>' +
+    '<div class="resumen-fila"><span class="res-lbl">Puntos</span><span class="res-val accent">' + miEq.pts + '</span></div>' +
+    '<div class="resumen-fila"><span class="res-lbl">Jugados</span><span class="res-val">' + miEq.pj + '</span></div>' +
+    '<div class="resumen-fila"><span class="res-lbl">Victorias</span><span class="res-val bueno">' + miEq.pg + '</span></div>' +
+    '<div class="resumen-fila"><span class="res-lbl">Empates</span><span class="res-val">' + miEq.pe + '</span></div>' +
+    '<div class="resumen-fila"><span class="res-lbl">Derrotas</span><span class="res-val malo">' + miEq.pp + '</span></div>' +
+    '<div class="resumen-fila"><span class="res-lbl">GF / GC</span><span class="res-val">' + miEq.gf + ' / ' + miEq.gc + '</span></div>' +
+    '<div class="resumen-fila"><span class="res-lbl">Diferencia</span><span class="res-val ' + difCls + '">' + difStr + '</span></div>';
+}
+
+function renderStatsLiga(ligaId) {
+  var data   = tablas[ligaId];
+  var lider  = data.equipos.length > 0 ? data.equipos[0].nombre : '-';
+  document.getElementById('stats-liga-titulo').textContent = data.nombre;
+  document.getElementById('stats-liga-body').innerHTML =
+    '<div class="stat-item"><span class="stat-lbl">L&iacute;der</span><span class="stat-val accent">' + lider + '</span></div>' +
+    '<div class="stat-item"><span class="stat-lbl">Jornada</span><span class="stat-val">' + data.jornada + '</span></div>';
+}
+
+function cambiarLiga(ligaId, nivel, nombre, tabEl) {
+  ligaActiva = ligaId;
+  document.querySelectorAll('.liga-tab').forEach(function(t) { t.classList.remove('active'); });
+  tabEl.classList.add('active');
+  document.getElementById('sub-titulo').textContent = nombre + ' \u00b7 ' + tablas[ligaId].temporada;
+  document.getElementById('footer-info').textContent = nombre + ' ' + tablas[ligaId].temporada;
+  renderTabla(ligaId);
+  renderLeyenda(nivel);
+  renderMiEquipo(ligaId);
+  renderStatsLiga(ligaId);
+}
+
+// Inicializar con la liga del manager
+renderTabla(ligaActiva);
+renderLeyenda(tablas[ligaActiva].nivel);
+renderMiEquipo(ligaActiva);
+renderStatsLiga(ligaActiva);
 </script>
 
 </body>

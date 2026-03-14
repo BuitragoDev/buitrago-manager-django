@@ -50,17 +50,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 28px;
+    gap: 20px;
   }
 
   /* TÍTULO */
-  .game-header {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-  }
+  .game-header { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
   .game-logo {
     font-family: 'Oswald', sans-serif;
     font-size: 56px;
@@ -83,8 +77,7 @@
     color: var(--text-dim);
   }
   .game-divider {
-    width: 120px;
-    height: 1px;
+    width: 120px; height: 1px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
     margin-top: 4px;
   }
@@ -99,64 +92,93 @@
     letter-spacing: 1px;
     padding: 8px 20px;
     border-radius: 4px;
-    margin-bottom: 8px;
     text-align: center;
   }
 
   /* INPUT NOMBRE */
-  .input-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
+  .input-section { display: flex; flex-direction: column; align-items: center; gap: 8px; }
   .input-label {
     font-family: 'Oswald', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 3px;
-    text-transform: uppercase;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase;
     color: var(--text-dim);
   }
   .input-nombre {
-    width: 340px;
-    padding: 12px 20px;
+    width: 340px; padding: 12px 20px;
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--text-pri);
     font-family: 'Oswald', sans-serif;
-    font-size: 18px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-align: center;
-    outline: none;
+    font-size: 18px; font-weight: 500; letter-spacing: 1px;
+    text-align: center; outline: none;
     transition: border-color .2s, box-shadow .2s;
   }
-  .input-nombre::placeholder {
-    color: var(--text-dim);
-    font-size: 15px;
-    letter-spacing: 2px;
-  }
+  .input-nombre::placeholder { color: var(--text-dim); font-size: 15px; letter-spacing: 2px; }
   .input-nombre:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(0,212,255,.12), 0 0 20px rgba(0,212,255,.08);
   }
 
-  /* GRID EQUIPOS */
-  .equipos-section {
-    width: 100%;
+  /* TABS DE LIGA */
+  .liga-tabs {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+  .liga-tab {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
+    padding: 10px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .2s;
+    min-width: 130px;
   }
+  .liga-tab:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-lit);
+  }
+  .liga-tab.active {
+    background: rgba(0,212,255,.08);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 4px 16px rgba(0,212,255,.15);
+  }
+  .liga-tab-nombre {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-sec);
+    transition: color .2s;
+  }
+  .liga-tab.active .liga-tab-nombre { color: var(--accent); }
+  .liga-tab:hover .liga-tab-nombre { color: var(--text-pri); }
+  .liga-tab-nivel {
+    display: none;
+  }
+  .liga-tab-logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.5));
+    transition: transform .2s;
+  }
+  .liga-tab:hover .liga-tab-logo,
+  .liga-tab.active .liga-tab-logo { transform: scale(1.08); }
+
+  /* GRID EQUIPOS */
+  .equipos-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
   .equipos-label {
     font-family: 'Oswald', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 3px;
-    text-transform: uppercase;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase;
     color: var(--text-dim);
   }
   .equipos-grid {
@@ -194,55 +216,38 @@
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0,0,0,.4);
   }
-  .equipo-card:hover::before {
-    background: linear-gradient(90deg, var(--accent), transparent);
-  }
+  .equipo-card:hover::before { background: linear-gradient(90deg, var(--accent), transparent); }
   .equipo-card.selected {
     background: rgba(0,212,255,.08);
     border-color: var(--accent);
     box-shadow: 0 0 0 1px var(--accent), 0 6px 24px rgba(0,212,255,.2);
     transform: translateY(-2px);
   }
-  .equipo-card.selected::before {
-    background: linear-gradient(90deg, var(--accent), rgba(0,212,255,.3));
-  }
+  .equipo-card.selected::before { background: linear-gradient(90deg, var(--accent), rgba(0,212,255,.3)); }
 
-  /* Escudo con color dinámico aplicado por JS */
   .escudo-badge {
-    width: 44px;
-    height: 44px;
-    border-radius: 4px;
-    object-fit: contain;
+    width: 44px; height: 44px;
+    border-radius: 4px; object-fit: contain;
     filter: drop-shadow(0 2px 6px rgba(0,0,0,.6));
-    transition: transform .2s;
-    flex-shrink: 0;
+    transition: transform .2s; flex-shrink: 0;
   }
   .equipo-card:hover .escudo-badge,
-  .equipo-card.selected .escudo-badge {
-    transform: scale(1.08);
-  }
+  .equipo-card.selected .escudo-badge { transform: scale(1.08); }
 
   .equipo-nombre {
     font-family: 'Oswald', sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: .5px;
+    font-size: 11px; font-weight: 500; letter-spacing: .5px;
     color: var(--text-sec);
-    text-align: center;
-    text-transform: uppercase;
-    line-height: 1.2;
+    text-align: center; text-transform: uppercase; line-height: 1.2;
     transition: color .2s;
   }
   .equipo-card:hover .equipo-nombre { color: var(--text-pri); }
   .equipo-card.selected .equipo-nombre { color: var(--accent); font-weight: 600; }
 
   .check-icon {
-    position: absolute;
-    top: 6px; right: 7px;
-    font-size: 12px;
-    color: var(--accent);
-    opacity: 0;
-    transition: opacity .2s;
+    position: absolute; top: 6px; right: 7px;
+    font-size: 12px; color: var(--accent);
+    opacity: 0; transition: opacity .2s;
   }
   .equipo-card.selected .check-icon { opacity: 1; }
 
@@ -250,95 +255,60 @@
   .btn-comenzar {
     padding: 13px 52px;
     background: linear-gradient(135deg, var(--accent2) 0%, #d03c14 100%);
-    border: none;
-    color: #fff;
+    border: none; color: #fff;
     font-family: 'Oswald', sans-serif;
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 5px;
+    font-size: 17px; font-weight: 600;
+    letter-spacing: 4px; text-transform: uppercase;
+    cursor: pointer; border-radius: 5px;
     box-shadow: 0 4px 24px rgba(255,107,53,.35);
     transition: all .2s;
-    position: relative;
-    overflow: hidden;
-    opacity: .4;
-    pointer-events: none;
+    position: relative; overflow: hidden;
+    opacity: .4; pointer-events: none;
   }
   .btn-comenzar::before {
     content: '';
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background: linear-gradient(135deg, rgba(255,255,255,.18) 0%, transparent 55%);
   }
   .btn-comenzar.ready { opacity: 1; pointer-events: all; }
-  .btn-comenzar.ready:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(255,107,53,.55);
-  }
+  .btn-comenzar.ready:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,107,53,.55); }
   .btn-comenzar.ready:active { transform: translateY(0); }
 
   .seleccion-info {
     font-family: 'Exo 2', sans-serif;
-    font-size: 13px;
-    color: var(--text-dim);
-    letter-spacing: .5px;
-    text-align: center;
-    height: 18px;
-    transition: color .2s;
+    font-size: 13px; color: var(--text-dim);
+    letter-spacing: .5px; text-align: center;
+    height: 18px; transition: color .2s;
   }
   .footer-disclaimer {
-    position: fixed;
-    bottom: 12px;
-    width: 100%;
+    position: fixed; bottom: 12px; width: 100%;
     text-align: center;
     font-family: 'Exo 2', sans-serif;
-    font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: .5px;
+    font-size: 11px; color: var(--text-dim); letter-spacing: .5px;
   }
   .footer-disclaimer a {
-    color: var(--text-dim);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    transition: color .2s;
+    color: var(--text-dim); text-decoration: underline;
+    text-underline-offset: 3px; transition: color .2s;
   }
   .footer-disclaimer a:hover { color: var(--text-sec); }
 
-  /* ── Bloqueo móvil ── */
+  /* Bloqueo móvil */
   .mobile-block {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #080c12;
-    z-index: 9999;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 32px;
-    text-align: center;
+    display: none; position: fixed; inset: 0;
+    background: #080c12; z-index: 9999;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px; padding: 32px; text-align: center;
   }
   .mobile-block-icon { font-size: 48px; }
   .mobile-block h2 {
-    font-family: 'Oswald', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #00d4ff;
+    font-family: 'Oswald', sans-serif; font-size: 22px;
+    font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #00d4ff;
   }
   .mobile-block p {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 14px;
-    color: #8ab0cc;
-    line-height: 1.7;
-    max-width: 300px;
+    font-family: 'Exo 2', sans-serif; font-size: 14px;
+    color: #8ab0cc; line-height: 1.7; max-width: 300px;
   }
-  @media (max-width: 1024px) {
-    .mobile-block { display: flex; }
-  }
+  @media (max-width: 1024px) { .mobile-block { display: flex; } }
 </style>
 </head>
 <body>
@@ -348,14 +318,16 @@
   <p>Tactical Eleven está diseñado para pantallas grandes.<br>
   Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
 </div>
+
 <div class="wrapper">
 
   <!-- TÍTULO -->
   <div class="game-header">
-    <div class="game-logo"><img src="{% static 'core/img/logo.png' %}" alt="logo" style="height:100px; width:auto; vertical-align:middle; margin-right:16px; filter:drop-shadow(0 0 20px rgba(0,212,255,.4));">
+    <div class="game-logo">
+      <img src="{% static 'core/img/tacticaleleven_logo.png' %}" alt="logo" style="height:100px; width:auto; vertical-align:middle; margin-right:16px; filter:drop-shadow(0 0 20px rgba(0,212,255,.4));">
       TACTICAL ELEVEN
     </div>
-    <div class="game-subtitle">Premier League &middot; Temporada 2025 &ndash; 26</div>
+    <div class="game-subtitle">English Football &middot; Temporada 2025&ndash;26</div>
     <div class="game-divider"></div>
   </div>
 
@@ -364,45 +336,38 @@
     {% csrf_token %}
     <input type="hidden" name="equipo_id" id="equipoIdInput" value="">
 
-    {% if error %}
-    <div class="error-msg">&#9888; {{ error }}</div>
-    {% endif %}
+    {% if error %}<div class="error-msg">&#9888; {{ error }}</div>{% endif %}
 
     <!-- NOMBRE -->
     <div class="input-section">
       <div class="input-label">Nombre del M&aacute;nager</div>
-      <input
-        class="input-nombre"
-        id="inputNombre"
-        type="text"
-        name="nombre"
-        maxlength="20"
-        placeholder="Introduce tu nombre"
-        oninput="actualizarEstado()"
-        autocomplete="off"
-        value="{% if nombre_previo %}{{ nombre_previo }}{% endif %}"
-      />
+      <input class="input-nombre" id="inputNombre" type="text" name="nombre"
+        maxlength="20" placeholder="Introduce tu nombre"
+        oninput="actualizarEstado()" autocomplete="off"
+        value="{% if nombre_previo %}{{ nombre_previo }}{% endif %}"/>
     </div>
-
-    <!-- EQUIPOS -->
-    <div class="equipos-section" style="margin-top:16px">
-      <div class="equipos-label">Elige tu equipo</div>
-      <div class="equipos-grid" id="equiposGrid">
-        {% for equipo in equipos %}
-        <div
-          class="equipo-card"
-          onclick="seleccionar(this, '{{ equipo.id }}', '{{ equipo.nombre_corto }}')"
-          data-id="{{ equipo.id }}"
-        >
-          <span class="check-icon">&#10004;</span>
-          <img class="escudo-badge" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
-          <span class="equipo-nombre">{{ equipo.nombre_corto }}</span>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-
   </form>
+
+  <!-- TABS DE LIGA -->
+  <div class="liga-tabs" id="ligaTabs">
+    {% for liga in ligas %}
+    <div class="liga-tab {% if forloop.first %}active{% endif %}"
+         onclick="cambiarLiga('{{ liga.id }}', this)"
+         data-liga-id="{{ liga.id }}">
+      <img class="liga-tab-logo" src="{% static 'core/img/logo_d' %}{{ liga.nivel }}.png" alt="{{ liga.nombre }}">
+      <span class="liga-tab-nombre">{{ liga.nombre }}</span>
+      <span class="liga-tab-nivel">División {{ liga.nivel }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- EQUIPOS -->
+  <div class="equipos-section">
+    <div class="equipos-label" id="equiposLabel">Elige tu equipo</div>
+    <div class="equipos-grid" id="equiposGrid">
+      <!-- Se renderiza por JS según la liga seleccionada -->
+    </div>
+  </div>
 
   <!-- ESTADO Y BOTÓN -->
   <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
@@ -416,14 +381,78 @@
 
 </div>
 
+<!-- Datos de equipos por liga inyectados desde Django -->
+<script type="application/json" id="datos-equipos">
+[
+  {% for equipo in equipos %}
+  {
+    "id": {{ equipo.id }},
+    "nombre_corto": "{{ equipo.nombre_corto }}",
+    "abreviatura": "{{ equipo.abreviatura }}",
+    "liga_id": {{ equipo.liga.id }}
+  }{% if not forloop.last %},{% endif %}
+  {% endfor %}
+]
+</script>
+<script type="application/json" id="datos-ligas">
+[
+  {% for liga in ligas %}
+  {
+    "id": {{ liga.id }},
+    "nombre": "{{ liga.nombre }}"
+  }{% if not forloop.last %},{% endif %}
+  {% endfor %}
+]
+</script>
+
 <script>
+  var STATIC_BASE = "{% static 'core/img/' %}";
+  var todosEquipos = JSON.parse(document.getElementById('datos-equipos').textContent);
+  var todasLigas   = JSON.parse(document.getElementById('datos-ligas').textContent);
+
+  var ligaActualId    = todasLigas.length > 0 ? todasLigas[0].id : null;
   var equipoSeleccionado = null;
-  var equipoNombre = '';
+  var equipoNombre       = '';
+
+  function renderEquipos(ligaId) {
+    var grid = document.getElementById('equiposGrid');
+    var equipos = todosEquipos.filter(function(e) { return e.liga_id === ligaId; });
+    grid.innerHTML = '';
+    equipos.forEach(function(eq) {
+      var div = document.createElement('div');
+      div.className = 'equipo-card';
+      div.dataset.id = eq.id;
+      div.innerHTML =
+        '<span class="check-icon">&#10004;</span>' +
+        '<img class="escudo-badge" src="' + STATIC_BASE + eq.abreviatura + '.png" alt="' + eq.abreviatura + '">' +
+        '<span class="equipo-nombre">' + eq.nombre_corto + '</span>';
+      div.onclick = function() { seleccionar(div, String(eq.id), eq.nombre_corto); };
+      grid.appendChild(div);
+    });
+  }
+
+  function cambiarLiga(ligaIdStr, tabEl) {
+    var ligaId = parseInt(ligaIdStr);
+    ligaActualId = ligaId;
+
+    // Resetear selección si el equipo seleccionado no es de esta liga
+    if (equipoSeleccionado) {
+      var eq = todosEquipos.find(function(e) { return e.id === parseInt(equipoSeleccionado); });
+      if (!eq || eq.liga_id !== ligaId) {
+        equipoSeleccionado = null;
+        equipoNombre = '';
+        document.getElementById('equipoIdInput').value = '';
+        actualizarEstado();
+      }
+    }
+
+    document.querySelectorAll('.liga-tab').forEach(function(t) { t.classList.remove('active'); });
+    tabEl.classList.add('active');
+    renderEquipos(ligaId);
+  }
 
   function seleccionar(card, id, nombre) {
-    document.querySelectorAll('.equipo-card').forEach(function(c) {
-      c.classList.remove('selected');
-    });
+    document.querySelectorAll('.equipo-card').forEach(function(c) { c.classList.remove('selected'); });
     card.classList.add('selected');
     equipoSeleccionado = id;
     equipoNombre = nombre;
@@ -435,22 +464,17 @@
     var nombre = document.getElementById('inputNombre').value.trim();
     var info   = document.getElementById('seleccionInfo');
     var btn    = document.getElementById('btnComenzar');
-
     if (nombre && equipoSeleccionado) {
       info.textContent = 'Manager: ' + nombre + '  \u00b7  Equipo: ' + equipoNombre;
-      info.classList.add('ok');
       btn.classList.add('ready');
-    } else if (nombre && !equipoSeleccionado) {
+    } else if (nombre) {
       info.textContent = 'Ahora elige tu equipo';
-      info.classList.remove('ok');
       btn.classList.remove('ready');
-    } else if (!nombre && equipoSeleccionado) {
+    } else if (equipoSeleccionado) {
       info.textContent = 'Introduce tu nombre de manager';
-      info.classList.remove('ok');
       btn.classList.remove('ready');
     } else {
       info.textContent = 'Introduce tu nombre y elige un equipo para comenzar';
-      info.classList.remove('ok');
       btn.classList.remove('ready');
     }
   }
@@ -459,6 +483,9 @@
     if (!equipoSeleccionado) return;
     document.getElementById('formInicio').submit();
   }
+
+  // Inicializar con la primera liga (Premier League)
+  renderEquipos(ligaActualId);
 </script>
 
 <div class="footer-disclaimer">

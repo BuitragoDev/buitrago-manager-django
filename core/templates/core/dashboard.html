@@ -293,7 +293,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 16px;
+      padding: 6px 14px;
       background: rgba(255, 255, 255, .025);
       border-bottom: 1px solid var(--border);
     }
@@ -334,7 +334,7 @@
     }
 
     .partido-body {
-      padding: 14px 24px;
+      padding: 8px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -345,21 +345,21 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 7px;
+      gap: 4px;
       flex: 1;
       min-width: 0;
     }
 
     .escudo-partido {
-      width: 52px;
-      height: 52px;
+      width: 38px;
+      height: 38px;
       object-fit: contain;
       filter: drop-shadow(0 2px 8px rgba(0, 0, 0, .4));
     }
 
     .nombre-eq {
       font-family: 'Oswald', sans-serif;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 600;
       text-align: center;
       color: var(--text-pri);
@@ -374,12 +374,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
+      gap: 3px;
     }
 
     .marcador-num {
       font-family: 'Oswald', sans-serif;
-      font-size: 46px;
+      font-size: 34px;
       font-weight: 700;
       letter-spacing: 6px;
       line-height: 1;
@@ -562,6 +562,10 @@
       color: var(--green);
     }
 
+    .pasc {
+      color: var(--green);
+    }
+
     .prel {
       color: var(--red);
     }
@@ -594,6 +598,11 @@
     }
 
     .sep-eur {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(0, 200, 117, .5), transparent);
+    }
+
+    .sep-asc {
       height: 1px;
       background: linear-gradient(90deg, rgba(0, 200, 117, .5), transparent);
     }
@@ -706,7 +715,7 @@
       letter-spacing: 2px;
       text-transform: uppercase;
       color: var(--text-dim);
-      padding: 10px 16px 4px;
+      padding: 6px 16px 3px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -719,24 +728,19 @@
       border-radius: 1px;
     }
 
-    .cat-gol::before {
-      background: var(--accent3);
-    }
-
-    .cat-asi::before {
-      background: var(--accent);
-    }
-
-    .cat-val::before {
-      background: var(--gold);
-    }
+    .cat-gol::before { background: var(--accent3); }
+    .cat-asi::before { background: var(--accent); }
+    .cat-val::before { background: var(--gold); }
+    .cat-min::before { background: var(--text-sec); }
+    .cat-ama::before { background: var(--yellow); }
+    .cat-roj::before { background: var(--red); }
 
     .stat-row {
-      padding: 10px 16px;
+      padding: 7px 16px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       transition: background .12s;
     }
 
@@ -745,8 +749,8 @@
     }
 
     .avatar {
-      width: 46px;
-      height: 46px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--bg-hover), var(--border));
       border: 1px solid var(--border-lit);
@@ -754,7 +758,7 @@
       align-items: center;
       justify-content: center;
       font-family: 'Oswald', sans-serif;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--text-sec);
       flex-shrink: 0;
@@ -767,7 +771,7 @@
 
     .stat-nombre {
       font-family: 'Oswald', sans-serif;
-      font-size: 17px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--text-pri);
       white-space: nowrap;
@@ -776,7 +780,7 @@
     }
 
     .stat-pos {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-dim);
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -792,22 +796,17 @@
 
     .stat-num {
       font-family: 'Oswald', sans-serif;
-      font-size: 34px;
+      font-size: 26px;
       font-weight: 700;
       line-height: 1;
     }
 
-    .num-gol {
-      color: var(--accent3);
-    }
-
-    .num-asi {
-      color: var(--accent);
-    }
-
-    .num-val {
-      color: var(--gold);
-    }
+    .num-gol { color: var(--accent3); }
+    .num-asi { color: var(--accent); }
+    .num-val { color: var(--gold); }
+    .num-min { color: var(--text-sec); }
+    .num-ama { color: var(--yellow); }
+    .num-roj { color: var(--red); }
 
     .stat-lbl {
       font-size: 9px;
@@ -1045,7 +1044,7 @@
           </div>
         </div>
         <div class="partido-footer">
-          <span>&#127967; {{ ultimo_partido.estadio }}</span>
+          <span>&#127967; {{ ultimo_partido.estadio|default:ultimo_partido.equipo_local.estadio }}</span>
           <span>&#128101; {{ ultimo_partido.asistencia }} esp.</span>
           <span>J{{ ultimo_partido.jornada.numero }}</span>
         </div>
@@ -1094,7 +1093,7 @@
           </div>
         </div>
         <div class="partido-footer">
-          <span>&#127967; {{ proximo_partido.estadio }}</span>
+          <span>&#127967; {{ proximo_partido.estadio|default:proximo_partido.equipo_local.estadio }}</span>
           <span></span>
           <span>J{{ proximo_partido.jornada.numero }}</span>
         </div>
@@ -1122,19 +1121,30 @@
           </thead>
           <tbody>
             {% for c in clasificacion %}
-            {% if c.pos == 18 %}
-            <tr class="sep-row">
-              <td colspan="4">
-                <div class="sep-rel"></div>
-              </td>
-            </tr>
+            {% comment %}Separador zona ascenso/champions{% endcomment %}
+            {% if liga.nivel == 1 and c.pos == 5 %}
+            <tr class="sep-row"><td colspan="4"><div class="sep-eur"></div></td></tr>
+            {% endif %}
+            {% if liga.nivel > 1 and c.pos == 4 %}
+            <tr class="sep-row"><td colspan="4"><div class="sep-asc"></div></td></tr>
+            {% endif %}
+            {% comment %}Separador zona descenso{% endcomment %}
+            {% if liga.nivel == 4 and c.pos == 17 %}
+            <tr class="sep-row"><td colspan="4"><div class="sep-rel"></div></td></tr>
+            {% endif %}
+            {% if liga.nivel < 4 and c.pos == 18 %}
+            <tr class="sep-row"><td colspan="4"><div class="sep-rel"></div></td></tr>
             {% endif %}
             <tr {% if c.equipo == equipo %}class="mi-fila" {% endif %}>
               <td>
                 <span class="pos-num
                   {% if c.pos == 1 %}p1
                   {% elif c.pos == 2 %}p2
-                  {% elif c.pos >= 18 %}prel
+                  {% elif c.pos == 3 %}p3
+                  {% elif liga.nivel == 1 and c.pos <= 4 %}peur
+                  {% elif liga.nivel > 1 and c.pos <= 3 %}pasc
+                  {% elif liga.nivel == 4 and c.pos >= 17 %}prel
+                  {% elif liga.nivel < 4 and c.pos >= 18 %}prel
                   {% endif %}">{{ c.pos }}</span>
               </td>
               <td>
@@ -1217,13 +1227,69 @@
             {{ mejor_valoracion.jugador__nombre|slice:":1" }}{{ mejor_valoracion.jugador__apellidos|slice:":1" }}
           </div>
           <div class="stat-info">
-            <div class="stat-nombre">{{ mejor_valoracion.jugador__nombre }} {{ mejor_valoracion.jugador__apellidos }}
-            </div>
+            <div class="stat-nombre">{{ mejor_valoracion.jugador__nombre }} {{ mejor_valoracion.jugador__apellidos }}</div>
             <div class="stat-pos">{{ mejor_valoracion.jugador__posicion }}</div>
           </div>
           <div class="stat-badge">
             <span class="stat-num num-val">{{ mejor_valoracion.media|floatformat:1 }}</span>
             <span class="stat-lbl">Media</span>
+          </div>
+        </div>
+        {% else %}
+        <div class="no-data">Sin datos a&uacute;n</div>
+        {% endif %}
+
+        <div class="stat-cat cat-min">M&aacute;s Minutos</div>
+        {% if max_minutos %}
+        <div class="stat-row">
+          <div class="avatar">
+            {{ max_minutos.jugador__nombre|slice:":1" }}{{ max_minutos.jugador__apellidos|slice:":1" }}
+          </div>
+          <div class="stat-info">
+            <div class="stat-nombre">{{ max_minutos.jugador__nombre }} {{ max_minutos.jugador__apellidos }}</div>
+            <div class="stat-pos">{{ max_minutos.jugador__posicion }}</div>
+          </div>
+          <div class="stat-badge">
+            <span class="stat-num num-min">{{ max_minutos.total }}</span>
+            <span class="stat-lbl">Min.</span>
+          </div>
+        </div>
+        {% else %}
+        <div class="no-data">Sin datos a&uacute;n</div>
+        {% endif %}
+
+        <div class="stat-cat cat-ama">M&aacute;s Amarillas</div>
+        {% if max_amarillas %}
+        <div class="stat-row">
+          <div class="avatar">
+            {{ max_amarillas.jugador__nombre|slice:":1" }}{{ max_amarillas.jugador__apellidos|slice:":1" }}
+          </div>
+          <div class="stat-info">
+            <div class="stat-nombre">{{ max_amarillas.jugador__nombre }} {{ max_amarillas.jugador__apellidos }}</div>
+            <div class="stat-pos">{{ max_amarillas.jugador__posicion }}</div>
+          </div>
+          <div class="stat-badge">
+            <span class="stat-num num-ama">{{ max_amarillas.total }}</span>
+            <span class="stat-lbl">&#127DF;</span>
+          </div>
+        </div>
+        {% else %}
+        <div class="no-data">Sin datos a&uacute;n</div>
+        {% endif %}
+
+        <div class="stat-cat cat-roj">M&aacute;s Rojas</div>
+        {% if max_rojas %}
+        <div class="stat-row">
+          <div class="avatar">
+            {{ max_rojas.jugador__nombre|slice:":1" }}{{ max_rojas.jugador__apellidos|slice:":1" }}
+          </div>
+          <div class="stat-info">
+            <div class="stat-nombre">{{ max_rojas.jugador__nombre }} {{ max_rojas.jugador__apellidos }}</div>
+            <div class="stat-pos">{{ max_rojas.jugador__posicion }}</div>
+          </div>
+          <div class="stat-badge">
+            <span class="stat-num num-roj">{{ max_rojas.total }}</span>
+            <span class="stat-lbl">&#127DF;</span>
           </div>
         </div>
         {% else %}

@@ -8,6 +8,7 @@ urlpatterns = [
 
     # ── Acción principal ────────────────────────────────────
     path("seguir/",       views.seguir,    name="seguir"),
+    path("jornada/",       views.jornada_resultado,   name="jornada_resultado"),
 
     # ── Secciones del juego ─────────────────────────────────
     path("plantilla/",    views.plantilla,    name="plantilla"),

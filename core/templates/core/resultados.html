@@ -9,19 +9,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-deep:   #080c12;
-    --bg-panel:  #0d1520;
-    --bg-card:   #111c2d;
-    --bg-hover:  #162234;
-    --border:    #1e304a;
-    --border-lit:#2a4668;
-    --accent:    #00d4ff;
-    --text-pri:  #eaf2fb;
-    --text-sec:  #8ab0cc;
-    --text-dim:  #3d5a75;
-    --green:     #00c875;
-    --red:       #ff3d5a;
-    --yellow:    #ffc337;
+    --bg-deep:    #080c12;
+    --bg-panel:   #0d1520;
+    --bg-card:    #111c2d;
+    --bg-hover:   #162234;
+    --border:     #1e304a;
+    --border-lit: #2a4668;
+    --accent:     #00d4ff;
+    --accent2:    #ff6b35;
+    --gold:       #ffc337;
+    --text-pri:   #eaf2fb;
+    --text-sec:   #8ab0cc;
+    --text-dim:   #3d5a75;
+    --green:      #00c875;
+    --red:        #ff3d5a;
+    --yellow:     #ffc337;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -46,20 +48,20 @@
     height: 64px; padding: 0 24px;
     box-shadow: 0 2px 24px rgba(0,0,0,.8); z-index: 100;
   }
-  .topbar-logo {
+  a.topbar-logo {
     font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700;
     letter-spacing: 4px; text-transform: uppercase;
     background: linear-gradient(90deg, var(--accent), #0095c8);
     -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     padding-right: 28px; border-right: 1px solid var(--border);
-    white-space: nowrap; flex-shrink: 0;
+    white-space: nowrap; flex-shrink: 0; text-decoration: none;
   }
   .topbar-team {
     display: flex; align-items: center; gap: 12px;
     padding: 0 28px; border-right: 1px solid var(--border); flex-shrink: 0;
   }
-  .escudo-top { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
-  .team-name   { font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 600; letter-spacing: 1px; color: var(--text-pri); line-height: 1.1; }
+  .escudo-top { width: 36px; height: 36px; object-fit: contain; }
+  .team-name { font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 600; letter-spacing: 1px; color: var(--text-pri); line-height: 1.1; }
   .team-league { font-size: 12px; color: var(--text-sec); text-transform: uppercase; letter-spacing: .8px; }
   .topbar-stat { display: flex; flex-direction: column; padding: 0 28px; border-right: 1px solid var(--border); gap: 1px; flex-shrink: 0; }
   .topbar-stat .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); }
@@ -80,9 +82,9 @@
 
   /* ══ MAIN ══ */
   .main {
-    flex: 1; min-height: 0; overflow: hidden;
-    padding: 16px 28px 14px;
-    display: flex; flex-direction: column; gap: 14px;
+    flex: 1; overflow: hidden;
+    padding: 14px 28px 10px;
+    display: flex; flex-direction: column; gap: 12px;
   }
   .page-title { display: flex; align-items: baseline; gap: 14px; flex-shrink: 0; }
   .page-title h1 {
@@ -92,125 +94,131 @@
   .page-title .sub { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; }
   .title-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-lit), transparent); margin-bottom: 3px; }
 
-  /* ══ PAGINADOR DE JORNADAS ══ */
+  /* ══ TABS ══ */
+  .liga-tabs { display: flex; gap: 10px; flex-shrink: 0; }
+  .liga-tab {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 8px 20px; min-width: 130px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer; transition: all .18s;
+  }
+  .liga-tab:hover { background: var(--bg-hover); border-color: var(--border-lit); }
+  .liga-tab.active {
+    background: rgba(0,212,255,.08); border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 4px 16px rgba(0,212,255,.12);
+  }
+  .liga-tab-logo {
+    height: 32px; width: auto; object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); transition: transform .18s;
+  }
+  .liga-tab:hover .liga-tab-logo,
+  .liga-tab.active .liga-tab-logo { transform: scale(1.08); }
+  .liga-tab-nombre {
+    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--text-sec); transition: color .18s;
+  }
+  .liga-tab.active .liga-tab-nombre { color: var(--accent); }
+  .liga-tab:hover .liga-tab-nombre { color: var(--text-pri); }
+
+  /* ══ PANEL POR LIGA ══ */
+  .liga-panel { display: none; flex: 1; min-height: 0; flex-direction: column; gap: 10px; }
+  .liga-panel.visible { display: flex; }
+
+  /* ══ PAGINADOR ══ */
   .paginador {
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; gap: 24px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; flex-shrink: 0;
   }
   .btn-nav {
-    width: 44px; height: 44px;
+    width: 36px; height: 36px; border-radius: 50%;
     background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 6px; cursor: pointer; color: var(--text-sec);
-    font-size: 20px; display: flex; align-items: center; justify-content: center;
-    transition: all .18s; flex-shrink: 0; user-select: none;
+    color: var(--text-sec); font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .18s;
   }
   .btn-nav:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,.08); }
-  .btn-nav:disabled { opacity: .25; cursor: not-allowed; }
-
-  .jornada-info {
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    min-width: 240px;
-  }
+  .btn-nav:disabled { opacity: .3; cursor: not-allowed; }
+  .jornada-info { text-align: center; min-width: 200px; }
   .jornada-num {
-    font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700;
-    letter-spacing: 3px; text-transform: uppercase; color: var(--text-pri);
+    font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--text-pri);
   }
-  .jornada-fecha { font-size: 15px; color: var(--text-sec); letter-spacing: 1px; }
+  .jornada-fecha { font-size: 12px; color: var(--text-dim); letter-spacing: .5px; margin-top: 2px; }
+  .jornada-badge-wrap { margin-top: 4px; }
   .jornada-badge {
-    font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700;
-    letter-spacing: 2px; padding: 4px 14px; border-radius: 3px;
+    display: inline-block;
+    font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 2px 10px; border-radius: 20px;
   }
-  .jornada-badge-wrap {
-    margin-top: 15px;
-  }
-  .badge-disputada  { color: var(--green);  border: 1px solid var(--green);  background: rgba(0,200,117,.08); }
-  .badge-pendiente  { color: var(--text-sec); border: 1px solid var(--border-lit); background: transparent; }
-  .badge-actual     { color: var(--yellow); border: 1px solid var(--yellow); background: rgba(255,195,55,.08); }
+  .badge-disputada { background: rgba(0,200,117,.12); color: var(--green); border: 1px solid rgba(0,200,117,.3); }
+  .badge-actual    { background: rgba(0,212,255,.12); color: var(--accent); border: 1px solid rgba(0,212,255,.3); }
+  .badge-pendiente { background: rgba(61,90,117,.15); color: var(--text-dim); border: 1px solid var(--border); }
 
-  /* Indicadores de jornada — una sola fila, sin wrap */
-  .jornada-dots {
-    display: flex; gap: 5px; align-items: center;
-    flex-wrap: nowrap; overflow: hidden;
-    max-width: 700px;
-  }
+  /* ══ DOTS ══ */
+  .jornada-dots { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; max-width: 900px; }
   .dot {
-    width: 13px; height: 13px; border-radius: 50%;
-    background: var(--border); cursor: pointer;
-    transition: all .15s; flex-shrink: 0;
+    width: 10px; height: 10px; border-radius: 50%; cursor: pointer;
+    transition: transform .15s, opacity .15s;
   }
-  .dot.disputada  { background: var(--green); opacity: .6; }
-  .dot.actual     { background: var(--yellow); transform: scale(1.4); opacity: 1; }
-  .dot.pendiente  { background: var(--border-lit); }
-  .dot:hover      { opacity: 1; transform: scale(1.4); }
+  .dot:hover { transform: scale(1.4); }
+  .dot.disputada { background: var(--border-lit); }
+  .dot.pendiente { background: var(--border); opacity: .4; }
+  .dot.actual    { background: var(--accent); box-shadow: 0 0 6px var(--accent); transform: scale(1.3); }
 
   /* ══ PARTIDOS ══ */
   .partidos-wrap {
     flex: 1; min-height: 0; overflow-y: auto;
-    display: flex; flex-direction: column; gap: 8px;
-    padding-right: 4px;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+    align-content: start;
   }
   .partidos-wrap::-webkit-scrollbar { width: 4px; }
   .partidos-wrap::-webkit-scrollbar-track { background: transparent; }
-  .partidos-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .partidos-wrap::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 2px; }
 
-  /* Tarjeta de partido */
   .partido-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    display: grid;
-    grid-template-columns: 1fr 130px 1fr;
-    align-items: center;
-    padding: 12px 20px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 20px;
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: center; gap: 12px;
     transition: border-color .15s;
-    gap: 12px;
+    min-height: 70px;
   }
   .partido-card:hover { border-color: var(--border-lit); }
-  .partido-card.mi-partido { border-left: 3px solid var(--accent); background: rgba(0,212,255,.04); }
-  .partido-card.mi-partido:hover { border-color: var(--accent); }
-
-  /* Equipo local (alineado a la derecha) */
-  .equipo-local {
-    display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0;
+  .partido-card.mi-partido {
+    border-color: var(--accent);
+    background: rgba(0,212,255,.05);
+    box-shadow: 0 0 0 1px rgba(0,212,255,.2);
   }
+
+  .equipo-local    { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+  .equipo-visitante{ display: flex; align-items: center; justify-content: flex-start; gap: 10px; }
+  .escudo-sm { width: 30px; height: 30px; object-fit: contain; flex-shrink: 0; }
   .equipo-nombre {
     font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600;
-    letter-spacing: .5px; color: var(--text-pri);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    color: var(--text-sec); white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; max-width: 200px; letter-spacing: .3px;
   }
   .equipo-nombre.mi-equipo { color: var(--accent); }
 
-  .escudo-sm { width: 28px; height: 28px; object-fit: contain; flex-shrink: 0; }
-
-  /* Marcador central */
-  .marcador {
-    display: flex; align-items: center; justify-content: center; gap: 0;
-    flex-shrink: 0;
-  }
+  .marcador { display: flex; align-items: center; gap: 6px; justify-content: center; flex-shrink: 0; }
   .gol {
-    font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700;
-    color: var(--text-pri); width: 40px; text-align: center; line-height: 1;
+    font-family: 'Oswald', sans-serif; font-size: 32px; font-weight: 700;
+    color: var(--text-pri); line-height: 1;
   }
-  .gol-sep {
-    font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 400;
-    color: var(--text-dim); padding: 0 2px; line-height: 1;
-  }
-  .marcador-pendiente {
-    font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 400;
-    color: var(--text-dim); letter-spacing: 4px;
-  }
-
-  /* Victoria/derrota/empate coloring */
   .gol.win  { color: var(--green); }
   .gol.lose { color: var(--red); }
   .gol.draw { color: var(--yellow); }
-
-  /* Equipo visitante (alineado a la izquierda) */
-  .equipo-visitante {
-    display: flex; align-items: center; justify-content: flex-start; gap: 10px; min-width: 0;
+  .gol-sep  {
+    font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 400;
+    color: var(--text-dim);
+  }
+  .marcador-pendiente {
+    font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 500;
+    color: var(--text-dim); letter-spacing: 2px;
   }
 
-  /* Footer */
+  /* ══ FOOTER ══ */
   footer {
     flex-shrink: 0; background: var(--bg-panel); border-top: 1px solid var(--border);
     padding: 7px 24px; display: flex; align-items: center; justify-content: space-between;
@@ -224,55 +232,33 @@
   .footer-ver { font-size: 12px; color: var(--text-dim); }
   .btn-reset {
     font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 600;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-dim); text-decoration: none;
-    border: 1px solid var(--border); padding: 4px 10px; border-radius: 3px; transition: all .18s;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+    text-decoration: none; border: 1px solid var(--border); padding: 4px 10px;
+    border-radius: 3px; transition: all .18s;
   }
   .btn-reset:hover { color: var(--red); border-color: var(--red); background: rgba(255,61,90,.08); }
-  /* ── Bloqueo móvil ── */
+
+  /* ══ MÓVIL ══ */
   .mobile-block {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #080c12;
-    z-index: 9999;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 32px;
-    text-align: center;
+    display: none; position: fixed; inset: 0; background: #080c12; z-index: 9999;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px; padding: 32px; text-align: center;
   }
   .mobile-block-icon { font-size: 48px; }
-  .mobile-block h2 {
-    font-family: 'Oswald', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #00d4ff;
-  }
-  .mobile-block p {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 14px;
-    color: #8ab0cc;
-    line-height: 1.7;
-    max-width: 300px;
-  }
-  @media (max-width: 1024px) {
-    .mobile-block { display: flex; }
-  }
+  .mobile-block h2 { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #00d4ff; }
+  .mobile-block p { font-family: 'Exo 2', sans-serif; font-size: 14px; color: #8ab0cc; line-height: 1.7; max-width: 300px; }
+  @media (max-width: 1024px) { .mobile-block { display: flex; } }
 </style>
 </head>
 <body>
 <div class="mobile-block">
   <div class="mobile-block-icon">🖥️</div>
   <h2>Escritorio requerido</h2>
-  <p>Tactical Eleven está diseñado para pantallas grandes.<br>
-  Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
+  <p>Tactical Eleven está diseñado para pantallas grandes.<br>Ábrelo desde un ordenador para disfrutar de la experiencia completa.</p>
 </div>
+
 <header class="topbar">
-  <div class="topbar-logo">Tactical Eleven</div>
+  <a href="{% url 'dashboard' %}" class="topbar-logo">Tactical Eleven</a>
   <div class="topbar-team">
     <img class="escudo-top" src="{% static 'core/img/'|add:equipo.abreviatura|add:'.png' %}" alt="{{ equipo.abreviatura }}">
     <div>
@@ -307,30 +293,43 @@
 <main class="main">
   <div class="page-title">
     <h1>Resultados</h1>
-    <span class="sub">{{ liga.nombre }} &middot; {{ liga.temporada }}</span>
+    <span class="sub" id="page-sub">{{ liga.nombre }} &middot; {{ liga.temporada }}</span>
     <div class="title-line"></div>
   </div>
 
-  <!-- PAGINADOR -->
-  <div class="paginador" style="margin: 6px 0 4px;">
-    <button class="btn-nav" id="btn-prev">&#8592;</button>
-    <div>
-      <div class="jornada-info">
-        <div class="jornada-num" id="lbl-jornada">Jornada 1</div>
-        <div class="jornada-fecha" id="lbl-fecha"></div>
-        <div id="lbl-badge" class="jornada-badge-wrap"></div>
-      </div>
+  <!-- TABS -->
+  <div class="liga-tabs">
+    {% for item in ligas_data %}
+    <div class="liga-tab {% if item.liga.id == liga.id %}active{% endif %}"
+         data-liga-idx="{{ forloop.counter0 }}">
+      <img class="liga-tab-logo" src="{% static 'core/img/logo_d' %}{{ item.liga.nivel }}.png" alt="{{ item.liga.nombre }}">
+      <span class="liga-tab-nombre">{{ item.liga.nombre }}</span>
     </div>
-    <button class="btn-nav" id="btn-next">&#8594;</button>
+    {% endfor %}
   </div>
 
-  <!-- DOTS -->
-  <div style="display:flex; justify-content:center; margin-bottom: 8px;">
-    <div class="jornada-dots" id="dots-container"></div>
+  <!-- UN PANEL POR LIGA -->
+  {% for item in ligas_data %}
+  <div class="liga-panel {% if item.liga.id == liga.id %}visible{% endif %}" id="panel-liga-{{ forloop.counter0 }}">
+    <!-- PAGINADOR -->
+    <div class="paginador">
+      <button class="btn-nav btn-prev">&#8592;</button>
+      <div class="jornada-info">
+        <div class="jornada-num lbl-jornada">Jornada 1</div>
+        <div class="jornada-fecha lbl-fecha"></div>
+        <div class="jornada-badge-wrap lbl-badge"></div>
+      </div>
+      <button class="btn-nav btn-next">&#8594;</button>
+    </div>
+    <!-- DOTS -->
+    <div style="display:flex;justify-content:center;">
+      <div class="jornada-dots dots-container"></div>
+    </div>
+    <!-- PARTIDOS -->
+    <div class="partidos-wrap partidos-container"></div>
   </div>
+  {% endfor %}
 
-  <!-- PARTIDOS -->
-  <div class="partidos-wrap" id="partidos-container"></div>
 </main>
 
 <footer>
@@ -345,158 +344,154 @@
   </div>
 </footer>
 
-<!-- Datos del servidor en JSON puro, sin mezclar con JS -->
+<!-- Datos de todas las ligas -->
 <script type="application/json" id="datos-servidor">
-{
-  "miEquipo":    "{{ equipo.nombre_corto|escapejs }}",
-  "jornadaIni":  {{ jornada_actual }},
-  "totalJorn":   {{ liga.jornadas_totales }},
-  "jornActual":  {{ liga.jornada_actual }},
-  "temporada":   "{{ liga.temporada|escapejs }}",
-  "staticBase":  "{% static 'core/img/' %}",
-  "jornadas": [{% for j in jornadas %}{"num":{{ j.numero }},"disputada":{{ j.disputada|yesno:"true,false" }},"partidos":[{% for p in j.partidos.all %}{"local":"{{ p.equipo_local.nombre_corto|escapejs }}","localColor":"{{ p.equipo_local.color_principal|escapejs }}","localAbr":"{{ p.equipo_local.abreviatura|escapejs }}","visitante":"{{ p.equipo_visitante.nombre_corto|escapejs }}","visitanteColor":"{{ p.equipo_visitante.color_principal|escapejs }}","visitanteAbr":"{{ p.equipo_visitante.abreviatura|escapejs }}","jugado":{{ p.jugado|yesno:"true,false" }},"golesLocal":{% if p.jugado %}{{ p.goles_local }}{% else %}null{% endif %},"golesVisitante":{% if p.jugado %}{{ p.goles_visitante }}{% else %}null{% endif %}}{% if not forloop.last %},{% endif %}{% endfor %}]}{% if not forloop.last %},{% endif %}{% endfor %}]
-}
+[
+  {% for item in ligas_data %}
+  {
+    "ligaId":      {{ item.liga.id }},
+    "nombre":      "{{ item.liga.nombre|escapejs }}",
+    "temporada":   "{{ item.liga.temporada|escapejs }}",
+    "miEquipo":    "{{ equipo.nombre|escapejs }}",
+    "jornadaIni":  {{ item.jornada_actual }},
+    "totalJorn":   {{ item.liga.jornadas_totales }},
+    "jornActual":  {{ item.liga.jornada_actual }},
+    "staticBase":  "{% static 'core/img/' %}",
+    "jornadas": [{% for j in item.jornadas %}{"num":{{ j.numero }},"disputada":{{ j.disputada|yesno:"true,false" }},"partidos":[{% for p in j.partidos.all %}{"local":"{{ p.equipo_local.nombre|escapejs }}","localAbr":"{{ p.equipo_local.abreviatura|escapejs }}","visitante":"{{ p.equipo_visitante.nombre|escapejs }}","visitanteAbr":"{{ p.equipo_visitante.abreviatura|escapejs }}","jugado":{{ p.jugado|yesno:"true,false" }},"golesLocal":{% if p.jugado %}{{ p.goles_local }}{% else %}null{% endif %},"golesVisitante":{% if p.jugado %}{{ p.goles_visitante }}{% else %}null{% endif %}}{% if not forloop.last %},{% endif %}{% endfor %}]}{% if not forloop.last %},{% endif %}{% endfor %}]
+  }{% if not forloop.last %},{% endif %}
+  {% endfor %}
+]
 </script>
 
 <script>
-  // ── Leer datos del servidor ───────────────────────────────────
-  const DATA        = JSON.parse(document.getElementById('datos-servidor').textContent);
-  const MI_EQUIPO   = DATA.miEquipo;
-  const JORNADA_INI = DATA.jornadaIni;
-  const TOTAL_JORN  = DATA.totalJorn;
-  const JORN_ACTUAL = DATA.jornActual;
-  const TEMPORADA   = DATA.temporada;
-  const JORNADAS    = DATA.jornadas;
+const TODAS_LIGAS = JSON.parse(document.getElementById('datos-servidor').textContent);
+const MI_EQUIPO_GLOBAL = TODAS_LIGAS[0].miEquipo; // mismo equipo en todas
 
+// Estado por panel
+const estados = TODAS_LIGAS.map(d => ({
+  jornadaActual: Math.max(1, Math.min(d.jornadaIni, d.totalJorn))
+}));
 
+function fechaJornada(temporada, num) {
+  const anio = parseInt(temporada.split('-')[0]);
+  const inicio = new Date(anio, 7, 9);
+  inicio.setDate(inicio.getDate() + (num - 1) * 7);
+  return inicio.toLocaleDateString('es-ES', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+}
 
-  // ── Helpers ───────────────────────────────────────────────────
-  function fechaJornada(num) {
-    const anio = parseInt(TEMPORADA.split('-')[0]);
-    const inicio = new Date(anio, 7, 9); // 9 agosto
-    inicio.setDate(inicio.getDate() + (num - 1) * 7);
-    return inicio.toLocaleDateString('es-ES', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+function escudoHTML(staticBase, abr) {
+  return `<img class="escudo-sm" src="${staticBase}${abr}.png" alt="${abr}">`;
+}
+
+function renderPanel(idx) {
+  const data = TODAS_LIGAS[idx];
+  const panel = document.getElementById(`panel-liga-${idx}`);
+  const jNum  = estados[idx].jornadaActual;
+  const j     = data.jornadas.find(x => x.num === jNum);
+
+  panel.querySelector('.lbl-jornada').textContent = `Jornada ${jNum}`;
+  panel.querySelector('.lbl-fecha').textContent = fechaJornada(data.temporada, jNum);
+
+  const badge = panel.querySelector('.lbl-badge');
+  if (j && j.disputada) {
+    badge.innerHTML = '<span class="jornada-badge badge-disputada">Disputada</span>';
+  } else if (jNum === data.jornActual) {
+    badge.innerHTML = '<span class="jornada-badge badge-actual">Pr&oacute;xima</span>';
+  } else {
+    badge.innerHTML = '<span class="jornada-badge badge-pendiente">Pendiente</span>';
   }
 
-  function escudoHTML(abr) {
-    return `<img class="escudo-sm" src="${DATA.staticBase}${abr}.png" alt="${abr}">`;
+  panel.querySelector('.btn-prev').disabled = jNum <= 1;
+  panel.querySelector('.btn-next').disabled = jNum >= data.totalJorn;
+
+  // Dots
+  const dotsC = panel.querySelector('.dots-container');
+  dotsC.innerHTML = '';
+  data.jornadas.forEach(jj => {
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    if (jj.num === jNum)    dot.classList.add('actual');
+    else if (jj.disputada)  dot.classList.add('disputada');
+    else                    dot.classList.add('pendiente');
+    dot.title = `Jornada ${jj.num}`;
+    dot.addEventListener('click', () => { estados[idx].jornadaActual = jj.num; renderPanel(idx); });
+    dotsC.appendChild(dot);
+  });
+
+  // Partidos
+  const cont = panel.querySelector('.partidos-container');
+  cont.innerHTML = '';
+  if (!j || j.partidos.length === 0) {
+    cont.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:40px;font-family:Oswald,sans-serif;letter-spacing:2px;font-size:13px;grid-column:1/-1;">SIN DATOS PARA ESTA JORNADA</div>';
+    return;
   }
 
-  // ── Estado ────────────────────────────────────────────────────
-  let jornadaActual = Math.max(1, Math.min(DATA.jornadaIni, TOTAL_JORN));
+  j.partidos.forEach(p => {
+    const esMiPartido = p.local === data.miEquipo || p.visitante === data.miEquipo;
+    const card = document.createElement('div');
+    card.className = 'partido-card' + (esMiPartido ? ' mi-partido' : '');
 
-  // ── Render dots ───────────────────────────────────────────────
-  function renderDots() {
-    const cont = document.getElementById('dots-container');
-    cont.innerHTML = '';
-    JORNADAS.forEach(j => {
-      const dot = document.createElement('div');
-      dot.className = 'dot';
-      if (j.num === jornadaActual) dot.classList.add('actual');
-      else if (j.disputada)        dot.classList.add('disputada');
-      else                         dot.classList.add('pendiente');
-      dot.title = `Jornada ${j.num}`;
-      dot.addEventListener('click', () => { jornadaActual = j.num; render(); });
-      cont.appendChild(dot);
-    });
-  }
-
-  // ── Render jornada ────────────────────────────────────────────
-  function render() {
-    const j = JORNADAS.find(x => x.num === jornadaActual);
-
-    // Cabecera
-    document.getElementById('lbl-jornada').textContent = `Jornada ${jornadaActual}`;
-    document.getElementById('lbl-fecha').textContent = fechaJornada(jornadaActual);
-
-    const badge = document.getElementById('lbl-badge');
-    if (j && j.disputada) {
-      badge.innerHTML = '<span class="jornada-badge badge-disputada">Disputada</span>';
-    } else if (jornadaActual === JORN_ACTUAL) {
-      badge.innerHTML = '<span class="jornada-badge badge-actual">Pr&oacute;xima</span>';
+    let marcadorHTML;
+    if (p.jugado && p.golesLocal !== null) {
+      const claseLocal = p.golesLocal > p.golesVisitante ? 'win' : p.golesLocal < p.golesVisitante ? 'lose' : 'draw';
+      const claseVisit = p.golesVisitante > p.golesLocal ? 'win' : p.golesVisitante < p.golesLocal ? 'lose' : 'draw';
+      marcadorHTML = `<div class="marcador"><span class="gol ${claseLocal}">${p.golesLocal}</span><span class="gol-sep">-</span><span class="gol ${claseVisit}">${p.golesVisitante}</span></div>`;
     } else {
-      badge.innerHTML = '<span class="jornada-badge badge-pendiente">Pendiente</span>';
+      marcadorHTML = `<div class="marcador"><span class="marcador-pendiente">vs</span></div>`;
     }
 
-    // Botones prev/next
-    document.getElementById('btn-prev').disabled = jornadaActual <= 1;
-    document.getElementById('btn-next').disabled = jornadaActual >= TOTAL_JORN;
+    const clsLocal = p.local === data.miEquipo ? ' mi-equipo' : '';
+    const clsVisit = p.visitante === data.miEquipo ? ' mi-equipo' : '';
 
-    // Partidos
-    const cont = document.getElementById('partidos-container');
-    cont.innerHTML = '';
-
-    if (!j || j.partidos.length === 0) {
-      cont.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:40px;font-family:Oswald,sans-serif;letter-spacing:2px;font-size:13px;">SIN DATOS PARA ESTA JORNADA</div>';
-      renderDots();
-      return;
-    }
-
-    j.partidos.forEach(p => {
-      const esMiPartido = p.local === MI_EQUIPO || p.visitante === MI_EQUIPO;
-      const card = document.createElement('div');
-      card.className = 'partido-card' + (esMiPartido ? ' mi-partido' : '');
-
-      let marcadorHTML;
-      if (p.jugado && p.golesLocal !== null) {
-        // Colores de resultado desde perspectiva del mi equipo
-        let claseLocal = '', claseVisit = '';
-        if (esMiPartido) {
-          const yoLocal = p.local === MI_EQUIPO;
-          const miGol = yoLocal ? p.golesLocal : p.golesVisitante;
-          const suGol = yoLocal ? p.golesVisitante : p.golesLocal;
-          const res = miGol > suGol ? 'win' : miGol < suGol ? 'lose' : 'draw';
-          claseLocal  = yoLocal ? res : (res === 'win' ? 'lose' : res === 'lose' ? 'win' : 'draw');
-          claseVisit  = !yoLocal ? res : (res === 'win' ? 'lose' : res === 'lose' ? 'win' : 'draw');
-        }
-        marcadorHTML = `
-          <div class="marcador">
-            <div class="gol ${claseLocal}">${p.golesLocal}</div>
-            <div class="gol-sep">-</div>
-            <div class="gol ${claseVisit}">${p.golesVisitante}</div>
-          </div>`;
-      } else {
-        marcadorHTML = `<div class="marcador"><span class="marcador-pendiente">vs</span></div>`;
-      }
-
-      const esLocalMiEquipo    = p.local === MI_EQUIPO ? ' mi-equipo' : '';
-      const esVisitanteMiEquipo = p.visitante === MI_EQUIPO ? ' mi-equipo' : '';
-
-      card.innerHTML = `
-        <div class="equipo-local">
-          <span class="equipo-nombre${esLocalMiEquipo}">${p.local}</span>
-          ${escudoHTML(p.localAbr)}
-        </div>
-        ${marcadorHTML}
-        <div class="equipo-visitante">
-          ${escudoHTML(p.visitanteAbr)}
-          <span class="equipo-nombre${esVisitanteMiEquipo}">${p.visitante}</span>
-        </div>`;
-
-      cont.appendChild(card);
-    });
-
-    renderDots();
-  }
-
-  // ── Eventos ───────────────────────────────────────────────────
-  document.getElementById('btn-prev').addEventListener('click', () => {
-    if (jornadaActual > 1) { jornadaActual--; render(); }
+    card.innerHTML = `
+      <div class="equipo-local">
+        <span class="equipo-nombre${clsLocal}">${p.local}</span>
+        ${escudoHTML(data.staticBase, p.localAbr)}
+      </div>
+      ${marcadorHTML}
+      <div class="equipo-visitante">
+        ${escudoHTML(data.staticBase, p.visitanteAbr)}
+        <span class="equipo-nombre${clsVisit}">${p.visitante}</span>
+      </div>`;
+    cont.appendChild(card);
   });
-  document.getElementById('btn-next').addEventListener('click', () => {
-    if (jornadaActual < TOTAL_JORN) { jornadaActual++; render(); }
-  });
+}
 
-  // Teclado: flechas izquierda/derecha
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft'  && jornadaActual > 1)         { jornadaActual--; render(); }
-    if (e.key === 'ArrowRight' && jornadaActual < TOTAL_JORN) { jornadaActual++; render(); }
-  });
+// Inicializar todos los paneles
+TODAS_LIGAS.forEach((_, idx) => renderPanel(idx));
 
-  // ── Render inicial ────────────────────────────────────────────
-  console.log('Tactical Eleven DEBUG — JORNADAS cargadas:', JORNADAS.length, '| jornadaIni:', JORNADA_INI, '| totalJorn:', TOTAL_JORN);
-  if (JORNADAS.length > 0) console.log('Primera jornada:', JORNADAS[0]);
-  render();
+// Tabs
+document.querySelectorAll('.liga-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const idx = parseInt(tab.dataset.ligaIdx);
+    document.querySelectorAll('.liga-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.liga-panel').forEach(p => p.classList.remove('visible'));
+    tab.classList.add('active');
+    document.getElementById(`panel-liga-${idx}`).classList.add('visible');
+    // Actualizar subtítulo
+    const d = TODAS_LIGAS[idx];
+    document.getElementById('page-sub').textContent = `${d.nombre} · ${d.temporada}`;
+  });
+});
+
+// Botones prev/next — delegados por panel
+document.querySelectorAll('.liga-panel').forEach((panel, idx) => {
+  panel.querySelector('.btn-prev').addEventListener('click', () => {
+    if (estados[idx].jornadaActual > 1) { estados[idx].jornadaActual--; renderPanel(idx); }
+  });
+  panel.querySelector('.btn-next').addEventListener('click', () => {
+    if (estados[idx].jornadaActual < TODAS_LIGAS[idx].totalJorn) { estados[idx].jornadaActual++; renderPanel(idx); }
+  });
+});
+
+// Flechas de teclado sobre el panel visible
+document.addEventListener('keydown', e => {
+  const panelVisible = document.querySelector('.liga-panel.visible');
+  if (!panelVisible) return;
+  const idx = parseInt(panelVisible.id.replace('panel-liga-', ''));
+  if (e.key === 'ArrowLeft'  && estados[idx].jornadaActual > 1)                        { estados[idx].jornadaActual--; renderPanel(idx); }
+  if (e.key === 'ArrowRight' && estados[idx].jornadaActual < TODAS_LIGAS[idx].totalJorn) { estados[idx].jornadaActual++; renderPanel(idx); }
+});
 </script>
 </body>
 </html>

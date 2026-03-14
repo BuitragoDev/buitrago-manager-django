@@ -355,14 +355,14 @@
   <div class="info-banner">
     <div class="info-item">
       <span class="lbl">Mi plantilla</span>
-      <span class="val {% if jugadores_equipo >= limite_plantilla %}limite-lleno{% elif jugadores_equipo >= 20 %}limite-warning{% else %}limite-ok{% endif %}">
+      <span id="banner-plantilla" class="val {% if jugadores_equipo >= limite_plantilla %}limite-lleno{% elif jugadores_equipo >= 20 %}limite-warning{% else %}limite-ok{% endif %}">
         {{ jugadores_equipo }} / {{ limite_plantilla }}
       </span>
     </div>
     <div class="info-sep"></div>
     <div class="info-item">
       <span class="lbl">Media de mi equipo</span>
-      <span class="val val-accent">{{ media_equipo }}</span>
+      <span id="banner-media" class="val val-accent">{{ media_equipo }}</span>
     </div>
     <div class="info-sep"></div>
     <div class="info-item">
@@ -371,13 +371,11 @@
         Basada en diferencia de nivel + ventana de mercado
       </span>
     </div>
-    {% if jugadores_equipo >= limite_plantilla %}
-    <div class="info-sep"></div>
-    <div class="info-item">
+    <div id="banner-lleno-sep" class="info-sep"{% if jugadores_equipo < limite_plantilla %} style="display:none"{% endif %}></div>
+    <div id="banner-lleno" class="info-item"{% if jugadores_equipo < limite_plantilla %} style="display:none"{% endif %}>
       <span class="lbl">&nbsp;</span>
-      <span class="val" style="color:var(--red); font-size:13px;">&#9888; Plantilla llena &mdash; vende o libera un jugador primero</span>
+      <span class="val" style="color:var(--red); font-size:13px;">&#9888; Plantilla llena &mdash; Libera un jugador primero</span>
     </div>
-    {% endif %}
   </div>
 
   <!-- TABLA -->
@@ -462,81 +460,125 @@
 <script type="application/json" id="datos-mercado">
 {
   "mediaEquipo": {{ media_equipo }},
-  "plantillaLlena": {% if jugadores_equipo >= limite_plantilla %}true{% else %}false{% endif %}
+  "jugadoresActual": {{ jugadores_equipo }},
+  "limitePlantilla": {{ limite_plantilla }}
 }
 </script>
 
 <script>
-  const CSRF = (document.cookie.split(';').find(c => c.trim().startsWith('csrftoken=')) || '').split('=')[1] || '';
-  const DATA_MERC = JSON.parse(document.getElementById('datos-mercado').textContent);
-  const MEDIA_EQUIPO = DATA_MERC.mediaEquipo;
+  const CSRF        = (document.cookie.split(';').find(c => c.trim().startsWith('csrftoken=')) || '').split('=')[1] || '';
+  const DATA_MERC   = JSON.parse(document.getElementById('datos-mercado').textContent);
+  const LIMITE      = DATA_MERC.limitePlantilla;
+  let   numJugadores = DATA_MERC.jugadoresActual;
+  let   mediaEquipo  = DATA_MERC.mediaEquipo;
 
-  // Escudos
-
-
-  // Color media según diferencia con mi equipo
+  // ── Color media según diferencia con mi equipo ───────────────
   document.querySelectorAll('[data-media]').forEach(el => {
     const media = parseFloat(el.getAttribute('data-media'));
-    const diff  = media - MEDIA_EQUIPO;
+    const diff  = media - mediaEquipo;
     const div   = el.querySelector('.media-val');
     if (diff >= 6)        div.classList.add('media-superior');
     else if (diff >= -3)  div.classList.add('media-similar');
     else                  div.classList.add('media-inferior');
   });
 
-  // Toast
+  // ── Actualiza el banner de plantilla y media ─────────────────
+  function actualizarBanner(nuevaMedia) {
+    // Plantilla
+    const spanPlant = document.getElementById('banner-plantilla');
+    spanPlant.textContent = numJugadores + ' / ' + LIMITE;
+    spanPlant.className = 'val ' + (
+      numJugadores >= LIMITE      ? 'limite-lleno'   :
+      numJugadores >= LIMITE - 2  ? 'limite-warning' :
+                                    'limite-ok'
+    );
+    // Aviso plantilla llena
+    const lleno = numJugadores >= LIMITE;
+    document.getElementById('banner-lleno-sep').style.display = lleno ? '' : 'none';
+    document.getElementById('banner-lleno').style.display     = lleno ? '' : 'none';
+    // Media
+    if (nuevaMedia !== undefined) {
+      mediaEquipo = nuevaMedia;
+      document.getElementById('banner-media').textContent = nuevaMedia;
+    }
+  }
+
+  // ── Bloquea todos los botones restantes ──────────────────────
+  function bloquearTodosBotones() {
+    document.querySelectorAll('.btn-fichar').forEach(b => {
+      const col = b.closest('.accion-col');
+      if (col) col.innerHTML = '<span class="dif-badge dif-muy-dificil">PLANTILLA LLENA</span>';
+    });
+  }
+
+  // Si ya venimos con plantilla llena al cargar, bloquear
+  if (numJugadores >= LIMITE) bloquearTodosBotones();
+
+  // ── Toast ─────────────────────────────────────────────────────
   let toastTimer;
   function mostrarToast(msg, tipo) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.style.borderColor = tipo === 'exito' ? 'var(--green)' : tipo === 'rechazo' ? 'var(--red)' : 'var(--yellow)';
-    t.style.color = tipo === 'exito' ? 'var(--green)' : tipo === 'rechazo' ? 'var(--red)' : 'var(--yellow)';
+    t.style.color       = tipo === 'exito' ? 'var(--green)' : tipo === 'rechazo' ? 'var(--red)' : 'var(--yellow)';
     t.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
   }
 
-  // Botones fichar
-  document.querySelectorAll('.btn-fichar').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const row    = btn.closest('.t-row');
-      const url    = row.getAttribute('data-fichar-url');
-      const nombre = row.getAttribute('data-nombre');
+  // ── Botones fichar (delegado en document) ────────────────────
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-fichar');
+    if (!btn) return;
 
-      btn.disabled = true;
-      btn.textContent = '...';
+    // Guardia local por si acaso
+    if (numJugadores >= LIMITE) {
+      mostrarToast('Plantilla llena. Libera un jugador primero.', 'limite');
+      return;
+    }
 
-      fetch(url, {
-        method: 'POST',
-        headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' }
-      })
-      .then(r => r.json())
-      .then(d => {
-        if (d.tipo === 'exito') {
-          btn.textContent = '✓ FICHADO';
-          btn.style.color = 'var(--green)';
-          btn.style.borderColor = 'var(--green)';
-          row.classList.add('fichado');
-          mostrarToast('¡' + nombre + ' fichado!', 'exito');
-        } else if (d.tipo === 'limite') {
-          btn.disabled = false;
-          btn.textContent = 'INTENTAR FICHAJE';
-          mostrarToast(d.mensaje, 'limite');
-        } else {
-          // rechazo — la oferta desaparece, solo había una oportunidad
-          mostrarToast('Rechazado: ' + d.mensaje, 'rechazo');
-          setTimeout(() => {
-            row.style.transition = 'opacity .5s';
-            row.style.opacity = '0';
-            setTimeout(() => row.remove(), 500);
-          }, 1200); // esperar a que el usuario lea el toast
-        }
-      })
-      .catch(() => {
-        btn.disabled = false;
-        btn.textContent = 'INTENTAR FICHAJE';
-        mostrarToast('Error de conexión', 'rechazo');
-      });
+    const row    = btn.closest('.t-row');
+    const url    = row.getAttribute('data-fichar-url');
+    const nombre = row.getAttribute('data-nombre');
+
+    btn.disabled    = true;
+    btn.textContent = '...';
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.tipo === 'exito') {
+        numJugadores++;
+        actualizarBanner(d.nueva_media);
+        btn.textContent       = '✓ FICHADO';
+        btn.style.color       = 'var(--green)';
+        btn.style.borderColor = 'var(--green)';
+        row.classList.add('fichado');
+        mostrarToast('¡' + nombre + ' fichado!', 'exito');
+        if (numJugadores >= LIMITE) bloquearTodosBotones();
+
+      } else if (d.tipo === 'limite') {
+        numJugadores = LIMITE;
+        actualizarBanner();
+        bloquearTodosBotones();
+        mostrarToast(d.mensaje, 'limite');
+
+      } else {
+        mostrarToast('Rechazado: ' + d.mensaje, 'rechazo');
+        setTimeout(() => {
+          row.style.transition = 'opacity .5s';
+          row.style.opacity    = '0';
+          setTimeout(() => row.remove(), 500);
+        }, 1200);
+      }
+    })
+    .catch(() => {
+      btn.disabled    = false;
+      btn.textContent = 'INTENTAR FICHAJE';
+      mostrarToast('Error de conexión', 'rechazo');
     });
   });
 </script>

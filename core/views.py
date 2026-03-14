@@ -25,15 +25,15 @@ def index(request):
         equipo_id = request.POST.get("equipo_id")
 
         if not nombre or not equipo_id:
-            liga    = Liga.objects.get(nombre="Premier League")
-            equipos = Equipo.objects.filter(liga=liga).order_by("nombre")
+            ligas   = Liga.objects.all().order_by("nivel")
+            equipos = Equipo.objects.select_related("liga").order_by("liga__nivel", "nombre")
             return render(request, "core/index.html", {
-                "equipos": equipos,
+                "ligas": ligas, "equipos": equipos,
                 "error": "Debes introducir tu nombre y elegir un equipo.",
             })
 
-        liga   = Liga.objects.get(nombre="Premier League")
         equipo = get_object_or_404(Equipo, pk=equipo_id)
+        liga   = equipo.liga
 
         manager = Manager.objects.create(
             nombre=nombre,
@@ -44,9 +44,9 @@ def index(request):
         request.session["manager_id"] = manager.pk
         return redirect("dashboard")
 
-    liga    = Liga.objects.get(nombre="Premier League")
-    equipos = Equipo.objects.filter(liga=liga).order_by("nombre")
-    return render(request, "core/index.html", {"equipos": equipos})
+    ligas   = Liga.objects.all().order_by("nivel")
+    equipos = Equipo.objects.select_related("liga").order_by("liga__nivel", "nombre")
+    return render(request, "core/index.html", {"ligas": ligas, "equipos": equipos})
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -81,7 +81,7 @@ def dashboard(request):
         c.pos = i + 1
 
     # ── Noticias ──────────────────────────────────────────────
-    noticias = Noticia.objects.filter(manager=manager).order_by("-jornada", "-creada_en")[:20]
+    noticias = Noticia.objects.filter(manager=manager).order_by("-creada_en")[:20]
 
     # ── Estadísticas de mi equipo ─────────────────────────────
     max_goleador  = _max_goleador(equipo, liga)
@@ -162,11 +162,17 @@ def seguir(request):
         jugadores_plantilla = equipo.jugadores.count()
 
         # Condiciones de destitución (descenso tiene prioridad)
+        # Premier/Championship/League One: zona descenso = pos >= 18 (últimos 3)
+        # League Two: zona peligro = pos >= 17 (últimos 4, descenso a National League)
         motivo = None
-        if posicion_final and posicion_final >= 18:
+        nivel_liga = liga.nivel
+        umbral_descenso = 17 if nivel_liga == 4 else 18
+        zona_nombre = "zona de descenso a la National League" if nivel_liga == 4 else "zona de descenso"
+
+        if posicion_final and posicion_final >= umbral_descenso:
             motivo = (
                 f"El equipo ha finalizado la temporada en <strong>{posicion_final}ª posición</strong>, "
-                f"en zona de descenso. Los resultados no han sido los esperados por la directiva."
+                f"en {zona_nombre}. Los resultados no han sido los esperados por la directiva."
             )
         elif jugadores_plantilla < 11:
             motivo = (
@@ -188,21 +194,170 @@ def seguir(request):
         # Sin destitución: registrar noticias de contratos expirados y continuar
         for nombre in liberados:
             Noticia.objects.create(
-                manager=manager, tipo="FIC", jornada=1,
+                manager=manager, tipo="FIC", jornada=liga.jornada_actual,
                 texto=f"{nombre} ha abandonado el club al expirar su contrato.",
             )
 
-        _iniciar_nueva_temporada(liga, manager, contratos_procesados=True)
+        ligas_pendientes = request.session.pop("ligas_pendientes_cierre", [])
+
+        if ligas_pendientes:
+            # Todas las ligas terminaron en la misma jornada 38.
+            # DOS PASADAS para garantizar 20 equipos por liga:
+            # Pasada 1: ascensos/descensos en todas las ligas (League Two → League One → Championship → Premier)
+            todas_ligas_a_cerrar = list(Liga.objects.filter(pk__in=ligas_pendientes).order_by("-nivel")) + [liga]
+            resultados = {}
+            for l in todas_ligas_a_cerrar:
+                resultados[l.pk] = _cerrar_temporada_liga(l)
+
+            # Tras los ascensos/descensos, el equipo del manager puede haber cambiado de liga.
+            # Actualizamos manager.liga para que apunte a la nueva liga correcta.
+            manager.equipo.refresh_from_db()
+            nueva_liga = manager.equipo.liga
+            manager.liga = nueva_liga
+            manager.save()
+
+            # Asegurar que la liga de destino del manager está en la lista a regenerar
+            pks_a_cerrar = {l.pk for l in todas_ligas_a_cerrar}
+            if nueva_liga.pk not in pks_a_cerrar:
+                todas_ligas_a_cerrar.append(nueva_liga)
+
+            # Pasada 2: regenerar calendarios y clasificaciones (ahora sí 20 equipos por liga)
+            for l in todas_ligas_a_cerrar:
+                # contratos_procesados=True solo para la liga de origen del manager (ya se procesaron arriba)
+                _regenerar_liga(l, manager, contratos_procesados=(l.pk == liga.pk))
+
+            # Noticias solo de la liga del manager (ya actualizada)
+            from .models import Noticia as _N
+            _N.objects.filter(manager=manager).delete()
+            campeon_liga_anterior = resultados[liga.pk]["campeon"]
+            nueva_liga.refresh_from_db()
+            _N.objects.create(
+                manager=manager, tipo="GEN", jornada=1,
+                texto=(
+                    f"Comienza la {nueva_liga.nombre} {nueva_liga.temporada}. "
+                    + (f"Campeón de {liga.nombre} la temporada anterior: {campeon_liga_anterior.nombre_corto}." if campeon_liga_anterior else "")
+                ),
+            )
+            for texto in resultados[liga.pk]["noticias_movimientos"]:
+                _N.objects.create(manager=manager, tipo="GEN", texto=texto, jornada=1)
+        else:
+            # Solo la liga del manager termina esta temporada
+            _iniciar_nueva_temporada(liga, manager, contratos_procesados=True, crear_noticias=True)
+
+            # También aquí: si el manager ascendió/descendió, actualizar manager.liga
+            manager.equipo.refresh_from_db()
+            nueva_liga = manager.equipo.liga
+            if nueva_liga.pk != liga.pk:
+                manager.liga = nueva_liga
+                manager.save()
+
         return redirect("dashboard")
 
     # ── Simular la jornada actual ─────────────────────────────
-    jornada = get_object_or_404(Jornada, liga=liga, numero=liga.jornada_actual)
+    jornada_num = liga.jornada_actual
+    jornada = get_object_or_404(Jornada, liga=liga, numero=jornada_num)
     simular_jornada(jornada, manager)
 
     liga.jornada_actual += 1
     liga.save()
 
-    return redirect("dashboard")
+    # Guardar jornadas simuladas de otras ligas
+    jornadas_otras = {}
+    ligas_terminadas = []  # ligas ajenas que acabaron jornada 38 — se procesan al pulsar Continuar
+    otras_ligas = Liga.objects.exclude(pk=liga.pk)
+    for otra_liga in otras_ligas:
+        otra_jornada = Jornada.objects.filter(
+            liga=otra_liga, numero=otra_liga.jornada_actual
+        ).first()
+        if otra_jornada and not otra_jornada.disputada:
+            jornadas_otras[otra_liga.pk] = otra_liga.jornada_actual
+            simular_jornada(otra_jornada, manager)
+            otra_liga.jornada_actual += 1
+            otra_liga.save()
+            # Si la otra liga terminó, la marcamos para procesarla después
+            if otra_liga.jornada_actual > otra_liga.jornadas_totales:
+                ligas_terminadas.append(otra_liga.pk)
+
+    # Guardar en sesión qué jornadas mostrar y qué ligas hay que cerrar
+    request.session["ultima_jornada"] = {
+        str(liga.pk): jornada_num,
+        **{str(pk): num for pk, num in jornadas_otras.items()}
+    }
+    request.session["ligas_pendientes_cierre"] = ligas_terminadas
+
+    return redirect("jornada_resultado")
+
+
+# ══════════════════════════════════════════════════════════════════
+#  JORNADA RESULTADO — Pantalla de resultados tras simular
+# ══════════════════════════════════════════════════════════════════
+
+def jornada_resultado(request):
+    manager = _get_manager(request)
+    if not manager:
+        return redirect("index")
+
+    ultima_jornada = request.session.get("ultima_jornada", {})
+    if not ultima_jornada:
+        return redirect("dashboard")
+
+    todas_ligas = Liga.objects.all().order_by("nivel")
+    datos_ligas = []
+
+    for liga_obj in todas_ligas:
+        jornada_num = ultima_jornada.get(str(liga_obj.pk))
+        if jornada_num is None:
+            continue
+        jornada_obj = Jornada.objects.filter(
+            liga=liga_obj, numero=jornada_num
+        ).first()
+        if not jornada_obj:
+            continue
+
+        partidos = Partido.objects.filter(
+            jornada=jornada_obj, jugado=True
+        ).select_related("equipo_local", "equipo_visitante").order_by("pk")
+
+        partidos_data = []
+        for p in partidos:
+            # Usar _id para evitar que select_related rompa la comparación ORM
+            goles_local = list(EstadisticaJugador.objects.filter(
+                partido=p, jugador__equipo_id=p.equipo_local_id, goles__gt=0
+            ).select_related("jugador").order_by("-goles"))
+            goles_visit = list(EstadisticaJugador.objects.filter(
+                partido=p, jugador__equipo_id=p.equipo_visitante_id, goles__gt=0
+            ).select_related("jugador").order_by("-goles"))
+
+            # MVP del partido (mejor valoración)
+            mvp = EstadisticaJugador.objects.filter(
+                partido=p
+            ).select_related("jugador").order_by("-valoracion").first()
+
+            partidos_data.append({
+                "partido":      p,
+                "goles_local":  goles_local,
+                "goles_visit":  goles_visit,
+                "mvp":          mvp,
+                "es_mi_partido": (
+                    p.equipo_local_id == manager.equipo_id or
+                    p.equipo_visitante_id == manager.equipo_id
+                ),
+            })
+
+        datos_ligas.append({
+            "liga":     liga_obj,
+            "jornada":  jornada_num,
+            "partidos": partidos_data,
+        })
+
+    context = {
+        "manager":     manager,
+        "equipo":      manager.equipo,
+        "liga":        manager.liga,
+        "datos_ligas": datos_ligas,
+        "fecha_juego": _fecha_jornada(manager.liga.jornada_actual, manager.liga.temporada),
+    }
+    return render(request, "core/jornada_resultado.html", context)
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -500,10 +655,15 @@ def fichar_jugador(request, oferta_id):
             texto=f"¡Fichaje completado! {jugador.nombre_completo} llega procedente de {equipo_origen}.",
             jornada=liga.jornada_actual,
         )
+        # Recalcular media del equipo tras el fichaje
+        nueva_media = Jugador.objects.filter(equipo=equipo).aggregate(
+            m=Avg((F("velocidad") + F("regate") + F("pase") + F("disparo") + F("defensa") + F("fisico")) / 6.0)
+        )["m"] or 0
         return JsonResponse({
             "ok": True,
             "tipo": "exito",
-            "mensaje": f"¡Fichado! {jugador.nombre_completo} ya es de {equipo.nombre_corto}."
+            "mensaje": f"¡Fichado! {jugador.nombre_completo} ya es de {equipo.nombre_corto}.",
+            "nueva_media": round(float(nueva_media), 1),
         })
     else:
         # Rechazado → quitarlo del mercado, solo hay una oportunidad
@@ -536,21 +696,28 @@ def clasificacion(request):
         return redirect("index")
 
     liga = manager.liga
-    tabla = Clasificacion.objects.filter(liga=liga).select_related("equipo").order_by(
-        "-puntos", "-goles_favor", "goles_contra"
-    )
-    tabla_list = list(tabla)
-    for i, c in enumerate(tabla_list):
-        c.pos = i + 1
 
-    # Calcular aquí para pasar al template como valor simple
-    jornadas_restantes = max(0, liga.jornadas_totales - liga.jornada_actual + 1)
+    # Construir tablas de todas las ligas para el template
+    todas_ligas = Liga.objects.all().order_by("nivel")
+    tablas_ctx = []
+    for l in todas_ligas:
+        tabla = Clasificacion.objects.filter(liga=l).select_related("equipo").order_by(
+            "-puntos", "-goles_favor", "goles_contra"
+        )
+        tabla_list = list(tabla)
+        for i, c in enumerate(tabla_list):
+            c.pos = i + 1
+        tablas_ctx.append({
+            "liga":  l,
+            "tabla": tabla_list,
+        })
 
     context = {
         "manager":     manager,
         "equipo":      manager.equipo,
         "liga":        liga,
-        "tabla":       tabla_list,
+        "todas_ligas": todas_ligas,
+        "tablas_ctx":  tablas_ctx,
         "fecha_juego": _fecha_jornada(liga.jornada_actual, liga.temporada),
     }
     return render(request, "core/clasificacion.html", context)
@@ -566,42 +733,51 @@ def estadisticas(request):
         return redirect("index")
 
     liga = manager.liga
+    todas_ligas = Liga.objects.all().order_by("nivel")
 
-    top_goleadores = EstadisticaJugador.objects.filter(
-    partido__jornada__liga=liga
-    ).values(
-        "jugador__nombre", "jugador__apellidos",
-        "jugador__equipo__nombre_corto",
-        "jugador__equipo__abreviatura",
-    ).annotate(total_goles=Sum("goles")).order_by("-total_goles")[:25]
+    def get_stats(l):
+        top_goleadores = EstadisticaJugador.objects.filter(
+            partido__jornada__liga=l
+        ).values(
+            "jugador__nombre", "jugador__apellidos",
+            "jugador__equipo__nombre_corto",
+            "jugador__equipo__abreviatura",
+        ).annotate(total_goles=Sum("goles")).filter(total_goles__gt=0).order_by("-total_goles")[:25]
 
-    top_asistentes = EstadisticaJugador.objects.filter(
-        partido__jornada__liga=liga
-    ).values(
-        "jugador__nombre", "jugador__apellidos",
-        "jugador__equipo__nombre_corto",
-        "jugador__equipo__abreviatura",
-    ).annotate(total_asistencias=Sum("asistencias")).order_by("-total_asistencias")[:25]
+        top_asistentes = EstadisticaJugador.objects.filter(
+            partido__jornada__liga=l
+        ).values(
+            "jugador__nombre", "jugador__apellidos",
+            "jugador__equipo__nombre_corto",
+            "jugador__equipo__abreviatura",
+        ).annotate(total_asistencias=Sum("asistencias")).filter(total_asistencias__gt=0).order_by("-total_asistencias")[:25]
 
-    top_valoracion = EstadisticaJugador.objects.filter(
-        partido__jornada__liga=liga, minutos_jugados__gt=0
-    ).values(
-        "jugador__nombre", "jugador__apellidos",
-        "jugador__equipo__nombre_corto",
-        "jugador__equipo__abreviatura",
-    ).annotate(
-        media_valoracion=Avg("valoracion"),
-        partidos=Sum("minutos_jugados")
-    ).filter(partidos__gte=3).order_by("-media_valoracion")[:25]
+        top_valoracion = EstadisticaJugador.objects.filter(
+            partido__jornada__liga=l, minutos_jugados__gt=0
+        ).values(
+            "jugador__nombre", "jugador__apellidos",
+            "jugador__equipo__nombre_corto",
+            "jugador__equipo__abreviatura",
+        ).annotate(
+            media_valoracion=Avg("valoracion"),
+            partidos=Sum("minutos_jugados")
+        ).filter(partidos__gte=3).order_by("-media_valoracion")[:25]
+
+        return {
+            "liga":           l,
+            "top_goleadores": top_goleadores,
+            "top_asistentes": top_asistentes,
+            "top_valoracion": top_valoracion,
+        }
+
+    ligas_stats = [get_stats(l) for l in todas_ligas]
 
     context = {
-        "manager":        manager,
-        "equipo":         manager.equipo,
-        "liga":           liga,
-        "top_goleadores": top_goleadores,
-        "top_asistentes": top_asistentes,
-        "top_valoracion": top_valoracion,
-        "fecha_juego":    _fecha_jornada(liga.jornada_actual, liga.temporada),
+        "manager":     manager,
+        "equipo":      manager.equipo,
+        "liga":        liga,
+        "ligas_stats": ligas_stats,
+        "fecha_juego": _fecha_jornada(liga.jornada_actual, liga.temporada),
     }
     return render(request, "core/estadisticas.html", context)
 
@@ -616,22 +792,25 @@ def resultados(request):
         return redirect("index")
 
     liga = manager.liga
+    todas_ligas = Liga.objects.all().order_by("nivel")
 
-    # Todas las jornadas (jugadas y pendientes) con sus partidos
-    jornadas = Jornada.objects.filter(liga=liga).prefetch_related(
-        "partidos__equipo_local", "partidos__equipo_visitante"
-    ).order_by("numero")
-
-    # Mostrar la última jornada disputada, o la 1 si no hay ninguna
-    jornada_actual = max(liga.jornada_actual - 1, 1)
+    ligas_data = []
+    for l in todas_ligas:
+        jornadas = Jornada.objects.filter(liga=l).prefetch_related(
+            "partidos__equipo_local", "partidos__equipo_visitante"
+        ).order_by("numero")
+        ligas_data.append({
+            "liga":          l,
+            "jornadas":      jornadas,
+            "jornada_actual": max(l.jornada_actual - 1, 1),
+        })
 
     context = {
-        "manager":        manager,
-        "equipo":         manager.equipo,
-        "liga":           liga,
-        "jornadas":       jornadas,
-        "jornada_actual": jornada_actual,
-        "fecha_juego":    _fecha_jornada(liga.jornada_actual, liga.temporada),
+        "manager":     manager,
+        "equipo":      manager.equipo,
+        "liga":        liga,
+        "ligas_data":  ligas_data,
+        "fecha_juego": _fecha_jornada(liga.jornada_actual, liga.temporada),
     }
     return render(request, "core/resultados.html", context)
 
@@ -648,61 +827,61 @@ def historico(request):
     from collections import Counter
     liga = manager.liga
     equipo = manager.equipo
+    todas_ligas = Liga.objects.all().order_by("nivel")
 
-    # Temporadas ya finalizadas y guardadas
-    registros = list(HistoricoTemporada.objects.filter(liga=liga).select_related(
-        "campeon", "subcampeon", "max_goleador", "mejor_jugador"
-    ).order_by("-temporada"))
+    def _stats_liga(l):
+        registros = list(HistoricoTemporada.objects.filter(liga=l).select_related(
+            "campeon", "subcampeon", "max_goleador", "mejor_jugador"
+        ).order_by("-temporada"))
 
-    # Si la temporada actual está terminada y aún no se ha guardado, calcularla al vuelo
-    if liga.jornada_actual > liga.jornadas_totales:
-        temporadas_guardadas = {r.temporada for r in registros}
-        if liga.temporada not in temporadas_guardadas:
-            datos = _datos_temporada(liga)
-            registros.insert(0, datos)
+        # Si la temporada actual está terminada y aún no guardada, calcularla al vuelo
+        if l.jornada_actual > l.jornadas_totales:
+            temporadas_guardadas = {r.temporada for r in registros}
+            if l.temporada not in temporadas_guardadas:
+                datos = _datos_temporada(l)
+                registros.insert(0, datos)
 
-    # ── Estadísticas del panel lateral ───────────────────────────
-    # Solo registros que son objetos HistoricoTemporada (no dicts)
-    registros_obj = [r for r in registros if hasattr(r, 'campeon')]
+        registros_obj = [r for r in registros if hasattr(r, 'campeon')]
+        total_temporadas = len(registros_obj)
 
-    total_temporadas = len(registros_obj)
+        mi_campeonatos = sum(1 for r in registros_obj if r.campeon    and r.campeon.pk    == equipo.pk)
+        mi_goleadores  = sum(1 for r in registros_obj if r.max_goleador  and r.max_goleador.equipo_id  == equipo.pk)
+        mi_mejores     = sum(1 for r in registros_obj if r.mejor_jugador and r.mejor_jugador.equipo_id == equipo.pk)
 
-    # Mi equipo
-    mi_campeonatos   = sum(1 for r in registros_obj if r.campeon    and r.campeon.pk    == equipo.pk)
-    mi_goleadores    = sum(1 for r in registros_obj if r.max_goleador  and r.max_goleador.equipo_id  == equipo.pk)
-    mi_mejores       = sum(1 for r in registros_obj if r.mejor_jugador and r.mejor_jugador.equipo_id == equipo.pk)
+        campeonatos_por_equipo = Counter(r.campeon.pk for r in registros_obj if r.campeon)
+        mejor_equipo_pk = campeonatos_por_equipo.most_common(1)[0][0] if campeonatos_por_equipo else None
 
-    # Mejor equipo histórico (más campeonatos)
-    campeonatos_por_equipo = Counter(
-        r.campeon.pk for r in registros_obj if r.campeon
-    )
-    mejor_equipo_pk = campeonatos_por_equipo.most_common(1)[0][0] if campeonatos_por_equipo else None
+        if mejor_equipo_pk:
+            from .models import Equipo as EQ
+            mejor_equipo        = EQ.objects.get(pk=mejor_equipo_pk)
+            mejor_equipo_camps  = campeonatos_por_equipo[mejor_equipo_pk]
+            mejor_equipo_gol    = sum(1 for r in registros_obj if r.max_goleador  and r.max_goleador.equipo_id  == mejor_equipo_pk)
+            mejor_equipo_mejor  = sum(1 for r in registros_obj if r.mejor_jugador and r.mejor_jugador.equipo_id == mejor_equipo_pk)
+        else:
+            mejor_equipo = None
+            mejor_equipo_camps = mejor_equipo_gol = mejor_equipo_mejor = 0
 
-    if mejor_equipo_pk:
-        from .models import Equipo as EQ
-        mejor_equipo = EQ.objects.get(pk=mejor_equipo_pk)
-        mejor_equipo_camps   = campeonatos_por_equipo[mejor_equipo_pk]
-        mejor_equipo_gol     = sum(1 for r in registros_obj if r.max_goleador  and r.max_goleador.equipo_id  == mejor_equipo_pk)
-        mejor_equipo_mejor   = sum(1 for r in registros_obj if r.mejor_jugador and r.mejor_jugador.equipo_id == mejor_equipo_pk)
-    else:
-        mejor_equipo = None
-        mejor_equipo_camps = mejor_equipo_gol = mejor_equipo_mejor = 0
+        return {
+            "liga":               l,
+            "registros":          registros,
+            "total_temporadas":   total_temporadas,
+            "mi_campeonatos":     mi_campeonatos,
+            "mi_goleadores":      mi_goleadores,
+            "mi_mejores":         mi_mejores,
+            "mejor_equipo":       mejor_equipo,
+            "mejor_equipo_camps": mejor_equipo_camps,
+            "mejor_equipo_gol":   mejor_equipo_gol,
+            "mejor_equipo_mejor": mejor_equipo_mejor,
+        }
+
+    ligas_historico = [_stats_liga(l) for l in todas_ligas]
 
     context = {
-        "manager":    manager,
-        "equipo":     equipo,
-        "liga":       liga,
-        "registros":  registros,
-        "fecha_juego": _fecha_jornada(liga.jornada_actual, liga.temporada),
-        # Panel lateral
-        "total_temporadas":   total_temporadas,
-        "mi_campeonatos":     mi_campeonatos,
-        "mi_goleadores":      mi_goleadores,
-        "mi_mejores":         mi_mejores,
-        "mejor_equipo":       mejor_equipo,
-        "mejor_equipo_camps": mejor_equipo_camps,
-        "mejor_equipo_gol":   mejor_equipo_gol,
-        "mejor_equipo_mejor": mejor_equipo_mejor,
+        "manager":        manager,
+        "equipo":         equipo,
+        "liga":           liga,
+        "ligas_historico": ligas_historico,
+        "fecha_juego":    _fecha_jornada(liga.jornada_actual, liga.temporada),
     }
     return render(request, "core/historico.html", context)
 
@@ -754,23 +933,16 @@ def _datos_temporada(liga):
 #  NUEVA TEMPORADA
 # ══════════════════════════════════════════════════════════════════
 
-def _iniciar_nueva_temporada(liga, manager, contratos_procesados=False):
+def _cerrar_temporada_liga(liga):
     """
-    Al acabar la temporada de la Premier League:
-    1. Guarda palmarés en HistoricoTemporada
-    2. Los 3 últimos descienden, 3 aleatorios de División Inferior suben
-    3. Limpia partidos, jornadas, estadísticas y clasificación
-    4. Genera nuevo calendario con los 20 equipos actualizados
-    5. Reinicia clasificación a cero
-    6. Avanza nombre de temporada
-    7. Crea noticias de resumen y movimientos
+    PASADA 1: guarda palmarés y ejecuta ascensos/descensos para UNA liga.
+    Devuelve dict con campeon y lista de noticias de movimientos.
+    NO toca calendarios ni clasificaciones todavía.
     """
-    from .models import EstadisticaJugador, HistoricoTemporada, Noticia
+    from .models import EstadisticaJugador, HistoricoTemporada
     from .models import Jugador as J
     from django.db.models import Sum, Avg
-    import random
 
-    # ── 1. Palmarés ───────────────────────────────────────────
     tabla = list(
         Clasificacion.objects.filter(liga=liga)
         .select_related("equipo")
@@ -803,96 +975,106 @@ def _iniciar_nueva_temporada(liga, manager, contratos_procesados=False):
         valoracion_mejor_jugador=mejor_val["media"] if mejor_val else None,
     )
 
-    # ── 2. Ascensos y descensos ───────────────────────────────
     noticias_movimientos = []
+    nivel_actual = liga.nivel
 
-    # 3 últimos de Premier descienden
-    descendidos = [c.equipo for c in tabla[-3:]]
+    # Los 3 últimos descienden (salvo League Two, nivel 4)
+    if nivel_actual < 4:
+        descendidos = [c.equipo for c in tabla[-3:]]
+        liga_inferior = Liga.objects.filter(nivel=nivel_actual + 1).first()
+        if liga_inferior:
+            for eq in descendidos:
+                eq.liga = liga_inferior
+                eq.save()
+                noticias_movimientos.append(f"{eq.nombre_corto} desciende a {liga_inferior.nombre}.")
 
-    # Buscar División Inferior
-    try:
-        division = Liga.objects.get(nombre="Division Inferior")
-    except Liga.DoesNotExist:
-        division = None
+    # Los 3 primeros ascienden (salvo Premier League, nivel 1)
+    if nivel_actual > 1:
+        ascendidos = [c.equipo for c in tabla[:3]]
+        liga_superior = Liga.objects.filter(nivel=nivel_actual - 1).first()
+        if liga_superior:
+            for eq in ascendidos:
+                eq.liga = liga_superior
+                eq.save()
+                noticias_movimientos.append(f"{eq.nombre_corto} asciende a {liga_superior.nombre}.")
 
-    ascendidos = []
-    if division:
-        # 3 equipos aleatorios de la División Inferior suben
-        equipos_division = list(Equipo.objects.filter(liga=division))
-        ascendidos = random.sample(equipos_division, min(3, len(equipos_division)))
+    return {
+        "campeon":              campeon,
+        "noticias_movimientos": noticias_movimientos,
+    }
 
-        # Aplicar movimientos
-        for eq in descendidos:
-            eq.liga = division
-            eq.save()
-            noticias_movimientos.append(f"{eq.nombre_corto} desciende a la Division Inferior.")
 
-        for eq in ascendidos:
-            eq.liga = liga
-            eq.save()
-            noticias_movimientos.append(f"{eq.nombre_corto} asciende a la Premier League.")
+def _regenerar_liga(liga, manager, contratos_procesados=False):
+    """
+    PASADA 2: limpia datos y genera calendario + clasificación nuevos.
+    Se llama DESPUÉS de que TODAS las ligas hayan ejecutado _cerrar_temporada_liga,
+    garantizando que cada liga tiene exactamente 20 equipos.
+    """
+    from .models import EstadisticaJugador
+    from .models import Jugador as J
+    from .models import Mercado
+    import random as _r
 
-    # ── 3. Limpiar datos de la temporada ──────────────────────
     EstadisticaJugador.objects.filter(partido__jornada__liga=liga).delete()
     Partido.objects.filter(jornada__liga=liga).delete()
     Jornada.objects.filter(liga=liga).delete()
     Clasificacion.objects.filter(liga=liga).delete()
 
-    # Curar lesiones
+    # Curar lesiones de todos los equipos de esta liga
     J.objects.filter(equipo__liga=liga).update(lesionado=False, jornadas_baja=0)
 
-    # ── 3b. Contratos: restar 1 temporada a los jugadores del manager ──
+    # Contratos del manager (solo si no se procesaron ya)
     if not contratos_procesados:
         jugadores_manager = list(J.objects.filter(equipo=manager.equipo))
-        liberados = []
         for jugador in jugadores_manager:
             jugador.temporadas_contrato -= 1
             if jugador.temporadas_contrato <= 0:
                 otros_equipos = list(Equipo.objects.exclude(pk=manager.equipo.pk))
                 if otros_equipos:
-                    import random as _r
                     jugador.equipo = _r.choice(otros_equipos)
                 jugador.temporadas_contrato = 0
-                liberados.append(jugador.nombre_completo)
-                from .models import Mercado
-                Mercado.objects.get_or_create(jugador=jugador, defaults={"liga": liga, "disponible": True, "dificultad_fichaje": 50})
+                Mercado.objects.get_or_create(
+                    jugador=jugador,
+                    defaults={"liga": liga, "disponible": True, "dificultad_fichaje": 50}
+                )
             jugador.save()
 
-        if liberados:
-            for nombre in liberados:
-                Noticia.objects.create(
-                    manager=manager, tipo="FIC", jornada=1,
-                    texto=f"{nombre} ha abandonado el club al expirar su contrato.",
-                )
-
-    # Recargar desde BD para evitar leer temporada cacheada/stale
     liga.refresh_from_db()
-    nueva_temp            = _calcular_nueva_temporada(liga.temporada)
-    liga.temporada        = nueva_temp
-    liga.jornada_actual   = 1
+    liga.temporada      = _calcular_nueva_temporada(liga.temporada)
+    liga.jornada_actual = 1
     liga.jornadas_totales = 38
     liga.save()
 
-    # ── 5. Nuevo calendario con los 20 equipos actualizados ───
-    equipos_premier = list(Equipo.objects.filter(liga=liga))
-    _generar_calendario_premier(liga, equipos_premier)
-
-    # ── 6. Clasificación a cero ───────────────────────────────
+    equipos = list(Equipo.objects.filter(liga=liga))
+    _generar_calendario_premier(liga, equipos)
     Clasificacion.objects.bulk_create([
         Clasificacion(liga=liga, equipo=eq, posicion=i + 1)
-        for i, eq in enumerate(equipos_premier)
+        for i, eq in enumerate(equipos)
     ])
 
-    # ── 7. Noticias ───────────────────────────────────────────
-    Noticia.objects.create(
-        manager=manager, tipo="GEN", jornada=1,
-        texto=(
-            f"Comienza la {liga.nombre} {liga.temporada}. "
-            f"Campeon de la temporada anterior: {campeon.nombre_corto if campeon else 'desconocido'}."
-        ),
-    )
-    for texto in noticias_movimientos:
-        Noticia.objects.create(manager=manager, tipo="GEN", texto=texto, jornada=1)
+
+def _iniciar_nueva_temporada(liga, manager, contratos_procesados=False, crear_noticias=False):
+    """
+    Punto de entrada para cerrar la temporada cuando SOLO la liga del manager termina.
+    Cuando todas las ligas terminan a la vez, usar el bloque de dos pasadas en seguir().
+    """
+    resultado = _cerrar_temporada_liga(liga)
+    _regenerar_liga(liga, manager, contratos_procesados=contratos_procesados)
+
+    from .models import Noticia
+    if crear_noticias:
+        Noticia.objects.filter(manager=manager).delete()
+        campeon = resultado["campeon"]
+        liga.refresh_from_db()
+        Noticia.objects.create(
+            manager=manager, tipo="GEN", jornada=1,
+            texto=(
+                f"Comienza la {liga.nombre} {liga.temporada}. "
+                f"Campeón de la temporada anterior: {campeon.nombre_corto if campeon else 'desconocido'}."
+            ),
+        )
+        for texto in resultado["noticias_movimientos"]:
+            Noticia.objects.create(manager=manager, tipo="GEN", texto=texto, jornada=1)
 
 def _generar_calendario_premier(liga, equipos):
     """
